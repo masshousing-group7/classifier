@@ -33,6 +33,7 @@ def process_name(name):
 def process_raw_data(data_file):
   today = date.today().toordinal()
   data = []
+  grades = []
   column_names = data_file.readline().strip().split(',')
   reader = csv.reader(data_file, dialect='excel')
 
@@ -59,16 +60,17 @@ def process_raw_data(data_file):
         if cols[i].upper() == 'A' or cols[i].upper() == 'B' or \
            cols[i].upper() == 'C':
           grade = 1
+        grades.append([grade])
       else:
         row.append(0 if cols[i] == '' else cols[i].replace(',',''))
-
-    # rating is the last column
-    row.append(grade)
     # convert all values to floating point numbers and append to data matrix
     data.append(map(float, row))
 
-  data_matrix = np.array(data)
-  preprocessing.scale(data_matrix)
+  # create numpy array from list object and scale features
+  data_matrix = preprocessing.scale(np.array(data))
+
+  # add grade column last
+  data_matrix = np.append(data_matrix, grades, axis=1)
 
   # second, change column names to match data
   new_column_names = []
