@@ -68,6 +68,7 @@ def process_raw_data(data_file):
     data.append(map(float, row))
 
   data_matrix = np.array(data)
+  preprocessing.scale(data_matrix)
 
   # second, change column names to match data
   new_column_names = []
@@ -129,12 +130,7 @@ try:
 
   # data matrix
   arff.write('@DATA\n')
-  for line in data_matrix:
-    last = len(line) - 1
-    for i in xrange(last + 1):
-      if i == last: arff.write('{0:g}'.format(line[i]))
-      else:         arff.write('{0:g},'.format(line[i])) 
-    arff.write('\n') 
+  np.savetxt(arff, data_matrix, fmt='%1g', delimiter=',', newline='\n')
 
 finally:
   arff.close()
