@@ -47,22 +47,21 @@ def process_raw_data(data_file):
   for cols in reader:
     row = []
     for i in xrange(len(cols)):
-      c_name = column_names[i].lower()
+      c_name = column_names[i].strip().lower()
+      c_val = cols[i].strip().upper()
       if 'date' in c_name: # handle date column
-        mdy = cols[i].strip().split('/')
+        mdy = c_val.split('/')
         d = date(int(mdy[2]), int(mdy[0]), int(mdy[1])).toordinal()
         row.append(today - d)
       elif 'code' in c_name: # handle detail code column
         for code in codes:
-          row.append(1 if cols[i] == code else 0)
+          row.append(1 if c_val == code else 0)
       elif 'grade' in c_name: # handle financial rating column
-        grade = 0
-        if cols[i].upper() == 'A' or cols[i].upper() == 'B' or \
-           cols[i].upper() == 'C':
-          grade = 1
-        grades.append([grade])
+        grades.append([1 if (c_val == 'A' or
+                             c_val == 'B' or
+                             c_val == 'C') else 0])
       else:
-        row.append(0 if cols[i] == '' else cols[i].replace(',',''))
+        row.append(0 if c_val == '' else c_val.replace(',',''))
     # convert all values to floating point numbers and append to data matrix
     data.append(map(float, row))
 
@@ -133,6 +132,5 @@ try:
   # data matrix
   arff.write('@DATA\n')
   np.savetxt(arff, data_matrix, fmt='%1g', delimiter=',', newline='\n')
-
 finally:
   arff.close()
