@@ -13,7 +13,7 @@ import os.path
 import csv
 import numpy as np
 from datetime import date
-from sklearn import preprocessing
+from sklearn import preprocessing as pp
 
 # output file name
 out_name = 'housingdata.arff'
@@ -66,7 +66,7 @@ def process_raw_data(data_file):
     data.append(map(float, row))
 
   # create numpy array from list object and scale features
-  data_matrix = preprocessing.scale(np.array(data))
+  data_matrix = pp.scale(np.array(data))
 
   # add grade column last
   data_matrix = np.append(data_matrix, grades, axis=1)

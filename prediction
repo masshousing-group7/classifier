@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #####
 #
 #  Script uses a K Nearest Neighbor Classifier to predict a Finantial Rating Grade
@@ -16,6 +18,7 @@ import weka.core.jvm as jvm
 from weka.core.converters import Loader
 from weka.classifiers import Classifier, Evaluation
 from weka.core.classes import Random
+from preprocess import preprocess_csv
 
 # function to translate the grade
 def get_grade(grade):
