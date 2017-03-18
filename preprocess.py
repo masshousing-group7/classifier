@@ -119,7 +119,7 @@ def preprocess_csv(csv_name):
       arff.write('@ATTRIBUTE ')
       arff.write(process_name(name))
       arff.write(' REAL\n')
-    arff.write('@ATTRIBUTE Financial_Rating {1, 0}\n\n')
+    arff.write('@ATTRIBUTE Financial_Rating {0, 1}\n\n')
 
     # data matrix
     arff.write('@DATA\n')
