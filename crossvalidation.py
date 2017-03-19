@@ -1,5 +1,3 @@
-import sys
-import traceback
 ######
 #
 #  Script performs 5 - fold - cross - validation for KNN classifier on a given dataset
@@ -8,6 +6,8 @@ import traceback
 #  Usage: python crossvalidation.py "<attributes to exclude>"
 #
 ######
+import sys
+import traceback
 import weka.core.jvm as jvm
 from weka.core.converters import Loader
 from weka.classifiers import Classifier, Evaluation, PredictionOutput
