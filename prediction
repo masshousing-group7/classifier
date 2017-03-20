@@ -84,7 +84,7 @@ def main():
         # make sure file exists
 		
         if not os.path.isfile("housingdata_train.arff"):
-            preprocess_csv("TrainingData.csv");
+            preprocess_csv("TrainingData.csv", "housingdata_train.arff");
 
         # number of neighbors for KNN
         k = 2
