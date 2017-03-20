@@ -16,7 +16,7 @@ from datetime import date
 from sklearn import preprocessing as pp
 
 # output file name
-out_name = 'housingdata.arff'
+out_name = 'housingdata_train.arff'
 
 ############################# BEGIN FUNCTION DEFINITIONS ######################
 

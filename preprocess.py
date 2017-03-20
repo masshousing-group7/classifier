@@ -96,7 +96,7 @@ def preprocess_csv(csv_name):
   ######################### END FUNCTION DEFINITIONS #########################
 
   # output file name
-  out_name = 'housingdata.arff'
+  out_name = 'housingdata_train.arff'
 
   # open the file
   data_file = open(csv_name, 'r')
