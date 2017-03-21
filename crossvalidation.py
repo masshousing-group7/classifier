@@ -46,19 +46,19 @@ def cross_validate(dataset, folds_number, filtered_attr):
    
 try:
     jvm.start()
-	    # load ARFF data set
-    loader = Loader(classname='weka.core.converters.ArffLoader')
-    data = loader.load_file('housingdata_train.arff')
-    data.class_is_last()
+	# load ARFF data set
+    # loader = Loader(classname='weka.core.converters.ArffLoader')
+    # data = loader.load_file('housingdata_train.arff')
+    # data.class_is_last()
 
-    # filter string values
-    filter = Filter(classname='weka.filters.unsupervised.attribute.RemoveType',\
-                                                       options=['-T', 'string'])
-    filter.inputformat(data)
-    filtered_data = filter.filter(data)
+    # # filter string values
+    # filter = Filter(classname='weka.filters.unsupervised.attribute.RemoveType',\
+                                                       # options=['-T', 'string'])
+    # filter.inputformat(data)
+    # filtered_data = filter.filter(data)
 	
-    list = list(rank_attributes(filtered_data))
-    list = list[-26:]
+    # list = list(rank_attributes(filtered_data))
+    # list = list[-26:]
    # for i in xrange(2, 26):
    # for index, inst in enumerate(itertools.combinations(list, 25)):
        # attr= ', '.join(map(str, inst))

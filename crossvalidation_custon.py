@@ -62,6 +62,7 @@ def main():
         fc.filter = remove
         fc.classifier = classifier
         fc.build_classifier(train)
+        f.write("------ " + str(i+1) + " fold-------\n")
         for index, inst in enumerate(test):
         # predict the grade
             prediction = fc.classify_instance(inst)
@@ -75,7 +76,6 @@ def main():
                         " predicted grade: " + get_grade(prediction) +
                         " class distribution: " + str(dist)+'\n')
         
-        f.write("------new fold-------")
     print(evaluation.summary("=== " + str(folds) + " -fold Cross-Validation ==="))
 
 try:
