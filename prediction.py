@@ -35,7 +35,7 @@ def classify_data_knn(data_set_train, data_set_test, neighbors_number):
 	
 	# here we set attributes that we want to remove to filter dataset
     # 73 and 74 - Unprocessed_Rm_Key and Unprocessed_Stmt_Date
-    remove = Filter(classname="weka.filters.unsupervised.attribute.Remove", options=["-R", "73,74"]) 
+    remove = Filter(classname="weka.filters.unsupervised.attribute.Remove", options=["-R", "73,74,50, 53, 68, 41, 45, 31, 34, 40, 44, 60, 61, 63, 67, 70, 72"]) 
 
     # training dataset (uses housingdata_train.arff )
     train = loader.load_file(data_set_train)
@@ -85,6 +85,7 @@ def main():
     try:
         jvm.start()
         # preprocess data
+        # to generate new housing_train.arff uncomment the next line and provide 'MassHousingTrainData.csv'
         #preprocess_csv('MassHousingTrainData.csv', 'housingdata_train.arff')
         preprocess_csv(sys.argv[1], 'housingdata_test.arff') 
         
