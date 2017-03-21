@@ -12,24 +12,28 @@ import weka.core.jvm as jvm
 from weka.core.converters import Loader
 from weka.classifiers import Classifier, Evaluation, PredictionOutput
 from weka.core.classes import Random
-from weka.filters import Filter
+from weka.filters import Filter, MultiFilter
 
 # filtered_attr may be: "1" or "first" - excludes first attribute from dataset ||
 #                       "1-3" - excludes 1,2 and 3 attributes
 #                       "4-8, 17, 19-20" - excludes 4,5,6,7,8,17,19,20 attributes
-def cross_validate(dataset, folds_number, filtered_attr):
+def cross_validate(dataset, folds_number, filtered_attr, k):
     # load ARFF data set
     loader = Loader(classname="weka.core.converters.ArffLoader")
     data = loader.load_file(dataset)
     data.class_is_last()
 
     # set KNN classifier
-    classifier = Classifier(classname='weka.classifiers.lazy.IBk', options=["-K", "3"])
+    classifier = Classifier(classname='weka.classifiers.lazy.IBk', options=["-K", "3"])	 
     
     # filter dataset
+    filter = Filter(classname='weka.filters.unsupervised.attribute.RemoveType',\
+                                                       options=['-T', 'string'])
     remove = Filter(classname="weka.filters.unsupervised.attribute.Remove", options=["-R", filtered_attr])
-    remove.inputformat(data)
-    filtered_data=remove.filter(data)
+    multi = MultiFilter()
+    multi.filters = [remove, filter]
+    multi.inputformat(data)
+    filtered_data=multi.filter(data)
     
     # evaluate filtered data with n-fold-cross-validation; n = folds_number
     evaluation = Evaluation(filtered_data)
