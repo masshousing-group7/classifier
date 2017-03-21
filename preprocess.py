@@ -63,12 +63,19 @@ def process_raw_data(data_file):
         if 'rm' in c_name and 'key' in c_name:
           unscaled_rm_key_col.append([cols[i]])
         # TODO find a way to insert '?' for missing values
-        row.append(0 if c_val == '' else c_val.replace(',',''))
+        row.append(np.nan if c_val == '' else c_val.replace(',',''))
     # convert all values to floating point numbers and append to data matrix
     data.append(map(float, row))
 
-  # create numpy array from list object and scale features
-  data_matrix = pp.scale(np.array(data))
+  # create numpy array from list object
+  data_matrix = np.array(data)
+
+  # impute missing values
+  imputer = pp.Imputer(missing_values='NaN', strategy='mean', axis=0)
+  data_matrix = imputer.fit_transform(data_matrix)
+
+  # scale features
+  data_matrix = pp.scale(data_matrix)
 
   # add unscaled columns and grade column last
   data_matrix = np.append(data_matrix, unscaled_rm_key_col, axis=1)
@@ -154,7 +161,7 @@ if __name__ == '__main__':
   if len(sys.argv) < 2:
     print 'Using default input csv file name:', in_name
   else:
-    out_name = sys.argv[1].strip()
+    in_name = sys.argv[1].strip()
     
   if len(sys.argv) < 3:
     print 'Using default output arff file name:', out_name

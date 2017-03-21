@@ -19,6 +19,7 @@ from weka.core.classes import Random
 from datetime import date
 from weka.filters import Filter
 from preprocess import preprocess_csv
+from crossvalidation import cross_validate
 
 # function to translate the grade
 def get_grade(grade):
@@ -35,15 +36,17 @@ def classify_data_knn(data_set_train, data_set_test, neighbors_number):
 	
 	# here we set attributes that we want to remove to filter dataset
     # 73 and 74 - Unprocessed_Rm_Key and Unprocessed_Stmt_Date
-    remove = Filter(classname="weka.filters.unsupervised.attribute.Remove", options=["-R", "73,74,50, 53, 68, 41, 45, 31, 34, 40, 44, 60, 61, 63, 67, 70, 72"]) 
+    remove = Filter(classname="weka.filters.unsupervised.attribute.Remove",\
+            options=["-R", "73,74,50, 53, 68, 41, 45, 31, 34, 40, 44, 60, 61,\
+                     63, 67, 70, 72"]) 
 
     # training dataset (uses housingdata_train.arff )
     train = loader.load_file(data_set_train)
     train.class_is_last()
 
     # testing dataset uses dataset, provided by TA
-    test = loader.load_file(data_set_test)
-    test.class_is_last()
+    #test = loader.load_file(data_set_test)
+    #test.class_is_last()
 
 	# build KNN classifier
     classifier = Classifier(classname='weka.classifiers.lazy.IBk', options=["-K", str(neighbors_number)])
@@ -56,7 +59,8 @@ def classify_data_knn(data_set_train, data_set_test, neighbors_number):
 
     # print false prediction to false_predictions.txt
     f = open('false_predictions.txt','w')
-    for index, inst in enumerate(test):
+    #for index, inst in enumerate(test):
+    for index, inst in enumerate(train):
         # predict the grade
         prediction = fc.classify_instance(inst)
         
@@ -69,7 +73,7 @@ def classify_data_knn(data_set_train, data_set_test, neighbors_number):
     f.close()
 
     # evaluate classifier	
-    simple_evaluation(train, test, fc)
+    cross_validate(data_set_train, 5, neighbors_number)
 
 # function to evaluate classifier and print some simple statistics
 def simple_evaluation(train_data_set, test_data_set, classifier):
@@ -86,8 +90,8 @@ def main():
         jvm.start()
         # preprocess data
         # to generate new housing_train.arff uncomment the next line and provide 'MassHousingTrainData.csv'
-        #preprocess_csv('MassHousingTrainData.csv', 'housingdata_train.arff')
-        preprocess_csv(sys.argv[1], 'housingdata_test.arff') 
+        preprocess_csv(sys.argv[1], 'housingdata_train.arff')
+        #preprocess_csv(sys.argv[1], 'housingdata_test.arff') 
         
         # number of neighbors for KNN
         k = 3

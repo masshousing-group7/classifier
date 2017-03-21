@@ -22,6 +22,8 @@ def rank_attributes(data_set):
   selector = AttributeSelection()
   evaluator = ASEvaluation(classname='weka.attributeSelection.CfsSubsetEval',\
                                                       options = ['-P 4 -E 4'])
+  #evaluator = ASEvaluation(classname='weka.attributeSelection.WrapperSubsetEval',\
+  #                options = ['-B','weka.classifiers.lazy.IBk'])
   searcher = ASSearch(classname='weka.attributeSelection.GreedyStepwise',\
                                                              options=['-R'])
   selector.jwrapper.setEvaluator(evaluator.jobject)

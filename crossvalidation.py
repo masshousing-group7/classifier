@@ -31,9 +31,10 @@ def cross_validate(dataset, folds_number, filtered_attr):
     # filter dataset
     filter = Filter(classname='weka.filters.unsupervised.attribute.RemoveType',\
                                                        options=['-T', 'string'])
-    remove = Filter(classname="weka.filters.unsupervised.attribute.Remove", options=["-R", filtered_attr])
+    #remove = Filter(classname="weka.filters.unsupervised.attribute.Remove", options=["-R", filtered_attr])
     multi = MultiFilter()
-    multi.filters = [remove, filter]
+    #multi.filters = [remove, filter]
+    multi.filters = [filter]
     multi.inputformat(data)
     filtered_data=multi.filter(data)
     
@@ -44,27 +45,28 @@ def cross_validate(dataset, folds_number, filtered_attr):
     # print statistic
     print str(evaluation.summary())
    
-try:
-    jvm.start()
-	# load ARFF data set
-    # loader = Loader(classname='weka.core.converters.ArffLoader')
-    # data = loader.load_file('housingdata_train.arff')
-    # data.class_is_last()
+if __name__ == '__main__':
+  try:
+      jvm.start()
+    # load ARFF data set
+      # loader = Loader(classname='weka.core.converters.ArffLoader')
+      # data = loader.load_file('housingdata_train.arff')
+      # data.class_is_last()
 
-    # # filter string values
-    # filter = Filter(classname='weka.filters.unsupervised.attribute.RemoveType',\
-                                                       # options=['-T', 'string'])
-    # filter.inputformat(data)
-    # filtered_data = filter.filter(data)
-	
-    # list = list(rank_attributes(filtered_data))
-    # list = list[-26:]
-   # for i in xrange(2, 26):
-   # for index, inst in enumerate(itertools.combinations(list, 25)):
-       # attr= ', '.join(map(str, inst))
-    attr = "50, 53, 68, 41, 45, 31, 34, 40, 44, 60, 61, 63, 67, 70, 72"
-    cross_validate("housingdata_train.arff", 5, attr)
-except Exception, e:
-    print(traceback.format_exc())
-finally:
-    jvm.stop()
+      # # filter string values
+      # filter = Filter(classname='weka.filters.unsupervised.attribute.RemoveType',\
+                                                         # options=['-T', 'string'])
+      # filter.inputformat(data)
+      # filtered_data = filter.filter(data)
+    
+      # list = list(rank_attributes(filtered_data))
+      # list = list[-26:]
+     # for i in xrange(2, 26):
+     # for index, inst in enumerate(itertools.combinations(list, 25)):
+         # attr= ', '.join(map(str, inst))
+      attr = "50, 53, 68, 41, 45, 31, 34, 40, 44, 60, 61, 63, 67, 70, 72"
+      cross_validate("housingdata_train.arff", 5, attr)
+  except Exception, e:
+      print(traceback.format_exc())
+  finally:
+      jvm.stop()
