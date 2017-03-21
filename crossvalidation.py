@@ -3,7 +3,7 @@
 #  Script performs 5 - fold - cross - validation for KNN classifier on a given dataset
 #  You can filter dataset by setting attributes, which you want to exclude
 #
-#  Usage: python crossvalidation.py "<attributes to exclude>"
+#  Usage: python crossvalidation.py 
 #
 ######
 import sys
@@ -17,7 +17,7 @@ from weka.filters import Filter, MultiFilter
 # filtered_attr may be: "1" or "first" - excludes first attribute from dataset ||
 #                       "1-3" - excludes 1,2 and 3 attributes
 #                       "4-8, 17, 19-20" - excludes 4,5,6,7,8,17,19,20 attributes
-def cross_validate(dataset, folds_number, filtered_attr, k):
+def cross_validate(dataset, folds_number, filtered_attr):
     # load ARFF data set
     loader = Loader(classname="weka.core.converters.ArffLoader")
     data = loader.load_file(dataset)
