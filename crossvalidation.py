@@ -44,7 +44,7 @@ def cross_validate(dataset, folds_number, filtered_attr, k):
 
 try:
     jvm.start()
-    cross_validate("housingdata_train.arff", 5, sys.argv[1])
+    cross_validate("housingdata_train.arff", 5, "")
 except Exception, e:
     print(traceback.format_exc())
 finally:
