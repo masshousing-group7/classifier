@@ -20,6 +20,7 @@ from datetime import date
 from weka.filters import Filter
 from preprocess import preprocess_csv
 from crossvalidation import cross_validate
+from attribute_ranking import rank_attributes
 
 # function to translate the grade
 def get_grade(grade):
@@ -33,16 +34,15 @@ def classify_data_knn(data_set_train, data_set_test, neighbors_number):
     # load ARFF data set
     loader = Loader(classname="weka.core.converters.ArffLoader")
     
-	
-	# here we set attributes that we want to remove to filter dataset
-    # 73 and 74 - Unprocessed_Rm_Key and Unprocessed_Stmt_Date
-    remove = Filter(classname="weka.filters.unsupervised.attribute.Remove",\
-            options=["-R", "73,74,50, 53, 68, 41, 45, 31, 34, 40, 44, 60, 61,\
-                     63, 67, 70, 72"]) 
-
     # training dataset (uses housingdata_train.arff )
     train = loader.load_file(data_set_train)
     train.class_is_last()
+
+    # immediately remove string attributes
+    remove = Filter(classname='weka.filters.unsupervised.attribute.RemoveType',\
+                                                       options=['-T', 'string'])
+    remove.inputformat(train)
+    no_strings = remove.filter(train)
 
     # testing dataset uses dataset, provided by TA
     #test = loader.load_file(data_set_test)
@@ -51,6 +51,17 @@ def classify_data_knn(data_set_train, data_set_test, neighbors_number):
 	# build KNN classifier
     classifier = Classifier(classname='weka.classifiers.lazy.IBk', options=["-K", str(neighbors_number)])
     
+    # here we set attributes that we want to remove to filter dataset
+    # 73 and 74 - Unprocessed_Rm_Key and Unprocessed_Stmt_Date
+    n = 10 # keep the top n features
+    features = rank_attributes(no_strings)
+    features = features[0:n]
+    features.extend([75])
+    feature_string = ','.join(map(str, features))
+    print 'Feature indices removed:', feature_string
+    remove = Filter(classname="weka.filters.unsupervised.attribute.Remove",\
+                                      options=['-V', "-R", feature_string]) 
+
     # create a filtered classifier
     fc = FilteredClassifier()
     fc.filter = remove
@@ -90,8 +101,11 @@ def main():
         jvm.start()
         # preprocess data
         # to generate new housing_train.arff uncomment the next line and provide 'MassHousingTrainData.csv'
-        preprocess_csv(sys.argv[1], 'housingdata_train.arff')
-        #preprocess_csv(sys.argv[1], 'housingdata_test.arff') 
+        csv_name = 'TrainingData.csv'
+        if len(sys.argv) > 1:
+          csv_name = sys.argv[1].strip()
+        preprocess_csv(csv_name, 'housingdata_train.arff')
+        #preprocess_csv(csv_name, 'housingdata_test.arff') 
         
         # number of neighbors for KNN
         k = 3
