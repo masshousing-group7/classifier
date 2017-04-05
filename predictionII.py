@@ -18,7 +18,7 @@ from weka.classifiers import Classifier, Evaluation, FilteredClassifier
 from weka.core.classes import Random
 from datetime import date
 from weka.filters import Filter
-from preprocess import preprocess_csv
+from preprocessII import preprocess_csv
 from crossvalidation import cross_validate
 from attribute_ranking import rank_attributes
 
@@ -39,8 +39,8 @@ def classify_data_knn(data_set_train, data_set_test, neighbors_number):
     train.class_is_last()
 
     # immediately remove string attributes
-    remove = Filter(classname='weka.filters.unsupervised.attribute.RemoveType',\
-                                           options=['-T', 'string'])
+    remove = Filter(classname='weka.filters.unsupervised.attribute.Remove',\
+                                           options=['-R', '111,112'])
     remove.inputformat(train)
     no_strings = remove.filter(train)
 
@@ -56,7 +56,8 @@ def classify_data_knn(data_set_train, data_set_test, neighbors_number):
     n = 10 # keep the top n features
     features = rank_attributes(no_strings)
     features = features[0:n]
-    features.extend([75])
+    features = map(lambda e: e + 1, features) # index offset by 1
+    features.extend([113])
     feature_string = ','.join(map(str, features))
     print 'Feature indices kept:', feature_string
     remove = Filter(classname="weka.filters.unsupervised.attribute.Remove",\
@@ -69,19 +70,19 @@ def classify_data_knn(data_set_train, data_set_test, neighbors_number):
     fc.build_classifier(train)
 
     # print false prediction to false_predictions.txt
-    f = open('false_predictions.txt','w')
-    #for index, inst in enumerate(test):
-    for index, inst in enumerate(train):
-        # predict the grade
-        prediction = fc.classify_instance(inst)
-        
-        #if a predicted value doesn't match an actual grade
-        if (inst.get_value(inst.class_index) != prediction):
-            f.write(" Rm_key: " + str(inst.get_string_value(72)) +  
-                    " Stmt_date: " + str(inst.get_string_value(73)) +
-                    " expected grade: " + get_grade(inst.get_value(inst.class_index)) +
-                    " predicted grade: " + get_grade(prediction) + '\n')
-    f.close()
+    #f = open('false_predictions.txt','w')
+    ##for index, inst in enumerate(test):
+    #for index, inst in enumerate(train):
+    #    # predict the grade
+    #    prediction = fc.classify_instance(inst)
+    #    
+    #    #if a predicted value doesn't match an actual grade
+    #    if (inst.get_value(inst.class_index) != prediction):
+    #        f.write(" Rm_key: " + str(inst.get_string_value(72)) +  
+    #                " Stmt_date: " + str(inst.get_string_value(73)) +
+    #                " expected grade: " + get_grade(inst.get_value(inst.class_index)) +
+    #                " predicted grade: " + get_grade(prediction) + '\n')
+    #f.close()
 
     # evaluate classifier	
     cross_validate(data_set_train, 5, neighbors_number)

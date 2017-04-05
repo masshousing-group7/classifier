@@ -28,6 +28,7 @@ def process_name(name):
 # takes a file pointer and returns the processed data matrix
 # and a list of column names in order
 def process_raw_data(data_file):
+  nyears = 5 # number of years in phase II training data
   today = date.today().toordinal()
   data = []
   tenth_year_grades = []
@@ -74,13 +75,13 @@ def process_raw_data(data_file):
     static_data = []
     if len(rows) >= 10:
       for i, val in enumerate(rows[0]): # append static data first
-        if i <= 26 or i >= 39: # cols that have repeating data
+        if i <= 26 or i >= 38: # cols that have repeating data
           static_data.append(val)
     while len(rows) >= 10: # get first five years of data then remove year 1
       five_years_data = static_data[:]
       for row in rows[0:5]: # append changing data for first five years
         for i, val in enumerate(row):
-          if i >= 27 and i <= 38 and i != 28: # changing data (except grade)
+          if i >= 27 and i <= 37 and i != 28: # changing data (except grade)
             five_years_data.append(val)
       data.append(map(float, five_years_data)) # append data to data matrix
       unscaled_rm_key_col.append([rows[9][0]]) # store original rm_key
@@ -100,26 +101,35 @@ def process_raw_data(data_file):
   data_matrix = pp.scale(data_matrix)
 
   # add unscaled columns and grade column last
-  data_matrix = np.append(data_matrix, tenth_year_grades, axis=1)
   data_matrix = np.append(data_matrix, unscaled_rm_key_col, axis=1)
   data_matrix = np.append(data_matrix, unscaled_stmt_year, axis=1)
+  data_matrix = np.append(data_matrix, tenth_year_grades, axis=1)
 
   # change column names to match data
   new_column_names = []
+  tmp_col_names = []
   for name in column_names:
-      name = name.strip().lower()
+      name = process_name(name.strip().lower())
       if 'date' in name:
-        new_column_names.append(name.replace('date','Days_Since').title())
+        tmp_col_names.append(name.replace('date','Days_Since').title())
       elif 'code' in name:
-        new_column_names.extend(['Is_Detail_Code_' + c for c in codes])
-      elif 'grade' in name or 'ratio' in name:
+        tmp_col_names.extend(['Is_Detail_Code_' + c for c in codes])
+      elif 'ratio' in name:
         pass
       else:
-        new_column_names.append(name.title())
+        tmp_col_names.append(name.title())
 
-  new_column_names.append('Financial_Grade_After_5_Years')
+  # second pass to make col names match phase II specification
+  new_column_names.extend(tmp_col_names[0:27]) # append static col names
+  new_column_names.extend(tmp_col_names[38:]) # append static col names
+  for i in xrange(nyears):
+    for name in tmp_col_names[27:38]: # append dynamic cols
+      if 'grade' not in name.lower(): # remove grade col
+        new_column_names.append(name + '_Year_' + str(i + 1))
+
   new_column_names.append('Unprocessed_Rm_Key')
   new_column_names.append('Unprocessed_Stmt_Date')
+  new_column_names.append('Financial_Grade_After_5_Years')
   
   return data_matrix, new_column_names
 
@@ -153,14 +163,17 @@ def preprocess_csv(csv_name, out_name):
     arff.write('@RELATION masshousingdata\n\n')
 
     # column names
-    for i, name in enumerate(column_names):
+    for name in column_names:
       arff.write('@ATTRIBUTE ')
-      arff.write(process_name(name))
       if 'unprocessed' in name.lower():
+        arff.write(name)
         arff.write(' STRING\n')
+      elif 'grade' in name.lower():
+        arff.write('class {A,B,C,D,F}\n')
       else:
+        arff.write(name)
         arff.write(' REAL\n')
-    arff.write('@ATTRIBUTE Financial_Rating_Grade {A,B,C,D,F}\n\n')
+    arff.write('\n')
 
     # data matrix
     arff.write('@DATA\n')
