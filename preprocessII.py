@@ -4,6 +4,10 @@
 #
 # Preprocess the .csv file containing mass-housing raw data.
 #
+# COLUMNS USED FROM RAW DATA (1-BASED)
+# STATIC: [1,6],[20,52]
+# DYNAMIC: 7,[11,19]
+#
 # Usage: ./preprocess <csv file path>
 # 
 ###############################################################################
