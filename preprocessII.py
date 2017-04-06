@@ -4,9 +4,11 @@
 #
 # Preprocess the .csv file containing mass-housing raw data.
 #
+# Output is both a .arff and .csv file
+#
 # COLUMNS USED FROM RAW DATA (1-BASED)
-# STATIC: [1,6],[20,52]
-# DYNAMIC: 7,[11,19]
+# STATIC: 1-6,20-52
+# DYNAMIC: 7,11-19
 #
 # Usage: ./preprocess <csv file path>
 # 
@@ -150,7 +152,7 @@ def process_raw_data(data_file):
 ######
 def preprocess_csv(csv_name, out_name):
 
-  # open the file
+  # open input file
   data_file = open(csv_name, 'r')
 
   # read and process data
@@ -159,31 +161,36 @@ def preprocess_csv(csv_name, out_name):
   finally:
     data_file.close()
 
-  # open file for writing
-  arff = open(out_name, 'w')
+  # open output files
+  arffFile = open(out_name + '.arff', 'w')
+  csvFile = open(out_name + '.csv', 'w')
 
-  # create ARFF file from data
+  # create ARFF and CSV files from data
   try:
-    arff.write('@RELATION masshousingdata\n\n')
+    csvWriter = csv.writer(csvFile, dialect='excel')
+    csvWriter.writerow(column_names)
+    np.savetxt(csvFile, data_matrix, fmt='%s', delimiter=',', newline='\n')
 
+    arffFile.write('@RELATION masshousingdata\n\n')
     # column names
     for name in column_names:
-      arff.write('@ATTRIBUTE ')
+      arffFile.write('@ATTRIBUTE ')
       if 'unprocessed' in name.lower():
-        arff.write(name)
-        arff.write(' STRING\n')
+        arffFile.write(name)
+        arffFile.write(' STRING\n')
       elif 'grade' in name.lower():
-        arff.write('class {A,B,C,D,F}\n')
+        arffFile.write('class {A,B,C,D,F}\n')
       else:
-        arff.write(name)
-        arff.write(' REAL\n')
-    arff.write('\n')
+        arffFile.write(name)
+        arffFile.write(' REAL\n')
+    arffFile.write('\n')
 
     # data matrix
-    arff.write('@DATA\n')
-    np.savetxt(arff, data_matrix, fmt='%s', delimiter=',', newline='\n')
+    arffFile.write('@DATA\n')
+    np.savetxt(arffFile, data_matrix, fmt='%s', delimiter=',', newline='\n')
   finally:
-    arff.close()
+    arffFile.close()
+    csvFile.close()
 
   return data_matrix
 
@@ -196,7 +203,7 @@ def preprocess_csv(csv_name, out_name):
 if __name__ == '__main__':
 
   in_name = 'TrainingData.csv'
-  out_name = 'housingdata_train.arff'
+  out_name = 'housingdata_train'
 
   if len(sys.argv) < 2:
     print 'Using default input csv file name:', in_name
@@ -204,7 +211,7 @@ if __name__ == '__main__':
     in_name = sys.argv[1].strip()
     
   if len(sys.argv) < 3:
-    print 'Using default output arff file name:', out_name
+    print 'Using default output file name:', out_name
   else:
     out_name = sys.argv[2].strip()
 
