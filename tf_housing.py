@@ -27,7 +27,7 @@ def main(unused_argv):
   classifier = tf.contrib.learn.DNNClassifier(
       feature_columns=feature_columns, 
       activation_fn = tf.nn.softplus, 
-      hidden_units=[10, 20, 10], 
+      hidden_units=[10, 20, 30, 20, 10], 
       n_classes=5,
       #optimizer=tf.train.ProximalAdagradOptimizer(
       #               learning_rate=0.1,

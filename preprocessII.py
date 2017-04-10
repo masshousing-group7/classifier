@@ -93,7 +93,17 @@ def process_raw_data(data_file):
       unscaled_rm_key_col.append([rows[9][0]]) # store original rm_key
       orig_date = date.fromordinal(today - rows[9][27])
       unscaled_stmt_year.append([orig_date.year]) # store stmt year
-      tenth_year_grades.append([rows[9][28]]) # store letter grade
+      letter_grade = rows[9][28] # store letter grade
+      if letter_grade == 'A':
+        tenth_year_grades.append([0])
+      elif letter_grade == 'B':
+        tenth_year_grades.append([1])
+      elif letter_grade == 'C':
+        tenth_year_grades.append([2])
+      elif letter_grade == 'D':
+        tenth_year_grades.append([3])
+      else:
+        tenth_year_grades.append([4])
       del rows[0]
 
   # create numpy array from list object
@@ -179,7 +189,7 @@ def preprocess_csv(csv_name, out_name):
         arffFile.write(name)
         arffFile.write(' STRING\n')
       elif 'grade' in name.lower():
-        arffFile.write('class {A,B,C,D,F}\n')
+        arffFile.write('class {0,1,2,3,4}\n')
       else:
         arffFile.write(name)
         arffFile.write(' REAL\n')
