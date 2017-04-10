@@ -45,6 +45,8 @@ def main():
     features = map(lambda e: e + 1, features) # index offset by 1
     features.extend([113])
     feature_string = ','.join(map(str, features))
+    feature_string = feature_string.replace(',51','').replace(',49','').replace(',36','').replace(',44','').replace(',47','').replace(',48','').replace(',8,',',').replace(',10,',',')
+    feature_string = feature_string.replace(',11,',',').replace(',13','').replace(',69','').replace(',42','').replace(',34','').replace(',72','').replace(',108','').replace(',60','')
     remove = Filter(classname="weka.filters.unsupervised.attribute.Remove",\
                                       options=['-V', '-R', feature_string]) 
     clf = Classifier(classname="weka.classifiers.trees.J48")
@@ -77,7 +79,7 @@ def main():
         cls.build_classifier(train)
         evaluation.test_model(cls, test)
 
-         # create a filtered classifier
+         # # create a filtered classifier
         fc = FilteredClassifier()
         fc.filter = remove
         fc.classifier = classifier
@@ -95,8 +97,10 @@ def main():
                         " expected grade: " + get_grade(inst.get_value(inst.class_index)) +
                         " predicted grade: " + get_grade(prediction) +
                         " class distribution: " + str(dist)+'\n')
-        
+	
+    print 'Feature indices kept:', feature_string					
     print(evaluation.summary("=== " + str(folds) + " -fold Cross-Validation ==="))
+    print(evaluation.matrix())
 
 try:
     jvm.start()
