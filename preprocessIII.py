@@ -4,12 +4,6 @@
 #
 # Preprocess the .csv file containing mass-housing raw data.
 #
-# Output is both a .arff and .csv file
-#
-# COLUMNS USED FROM RAW DATA (1-BASED)
-# STATIC: 1-6,20-52
-# DYNAMIC: 7,11-19
-#
 # Usage: ./preprocess <csv file path>
 # 
 ###############################################################################
@@ -34,13 +28,12 @@ def process_name(name):
 # takes a file pointer and returns the processed data matrix
 # and a list of column names in order
 def process_raw_data(data_file):
-  nyears = 5 # number of years in phase II training data
   today = date.today().toordinal()
   data = []
-  tenth_year_grades = []
-  unscaled_rm_key_col = []
-  unscaled_stmt_year = []
-  rm_map = {}
+  grades = []
+  unscaled_detail_codes = []
+  raw_rm_key_col = []
+  raw_stmt_date_col = []
   column_names = data_file.readline().strip().split(',')
   reader = csv.reader(data_file, dialect='excel')
 
@@ -57,54 +50,33 @@ def process_raw_data(data_file):
       c_name = column_names[i].strip().lower()
       c_val = cols[i].strip().upper()
       if 'date' in c_name: # handle date column
+        if 'stmt' in c_name:
+          raw_stmt_date_col.append([cols[i]])
         mdy = c_val.split('/')
         d = date(int(mdy[2]), int(mdy[0]), int(mdy[1])).toordinal()
         row.append(today - d)
       elif 'code' in c_name: # handle detail code column
+        detail_codes = []
         for code in codes:
-          row.append(1 if c_val == code else 0)
-      elif 'ratio' in c_name: # ignore DSC Ratio and Current Ratio
-        pass
+          detail_codes.append(1 if c_val == code else 0)
+        unscaled_detail_codes.append(detail_codes)
+      elif 'grade' in c_name: # handle financial rating column
+        if c_val == 'A':
+          grades.append([0])
+        elif c_val == 'B':
+          grades.append([1])
+        elif c_val == 'C':
+          grades.append([2])
+        elif c_val == 'D':
+          grades.append([3])
+        else:
+          grades.append([4])
       else:
-        # replace missing values with NaN
+        if 'rm' in c_name and 'key' in c_name:
+          raw_rm_key_col.append([cols[i]])
         row.append(np.nan if c_val == '' else c_val.replace(',',''))
-    # append row to list of rows associated with rm_key
-    rm_key = int(row[0])
-    if rm_key in rm_map:
-      rm_map[rm_key].append(row)
-    else:
-      rm_map[rm_key] = [row]
-
-  # reorganize data according to phase II scheme
-  # CAUTION: MAGIC NUMBERS USED!
-  for rm_key, rows in rm_map.iteritems():
-    static_data = []
-    if len(rows) >= 10:
-      for i, val in enumerate(rows[0]): # append static data first
-        if i <= 26 or i >= 38: # cols that have repeating data
-          static_data.append(val)
-    while len(rows) >= 10: # get first five years of data then remove year 1
-      five_years_data = static_data[:]
-      for row in rows[0:5]: # append changing data for first five years
-        for i, val in enumerate(row):
-          if i >= 27 and i <= 37 and i != 28: # changing data (except grade)
-            five_years_data.append(val)
-      data.append(map(float, five_years_data)) # append data to data matrix
-      unscaled_rm_key_col.append([rows[9][0]]) # store original rm_key
-      orig_date = date.fromordinal(today - rows[9][27])
-      unscaled_stmt_year.append([orig_date.year]) # store stmt year
-      letter_grade = rows[9][28] # store letter grade
-      if letter_grade == 'A':
-        tenth_year_grades.append([0])
-      elif letter_grade == 'B':
-        tenth_year_grades.append([1])
-      elif letter_grade == 'C':
-        tenth_year_grades.append([2])
-      elif letter_grade == 'D':
-        tenth_year_grades.append([3])
-      else:
-        tenth_year_grades.append([4])
-      del rows[0]
+    # convert all values to floating point numbers and append to data matrix
+    data.append(map(float, row))
 
   # create numpy array from list object
   data_matrix = np.array(data)
@@ -113,39 +85,29 @@ def process_raw_data(data_file):
   imputer = pp.Imputer(missing_values='NaN', strategy='mean', axis=0)
   data_matrix = imputer.fit_transform(data_matrix)
 
-  # scale features
+  # scale features (normalization)
   data_matrix = pp.scale(data_matrix)
 
-  # add unscaled columns and grade column last
-  data_matrix = np.append(data_matrix, unscaled_rm_key_col, axis=1)
-  data_matrix = np.append(data_matrix, unscaled_stmt_year, axis=1)
-  data_matrix = np.append(data_matrix, tenth_year_grades, axis=1)
+  # add unscaled detail codes, grades, and raw data
+  data_matrix = np.append(data_matrix, unscaled_detail_codes, axis=1)
+  data_matrix = np.append(data_matrix, raw_rm_key_col, axis=1)
+  data_matrix = np.append(data_matrix, raw_stmt_date_col, axis=1)
+  data_matrix = np.append(data_matrix, grades, axis=1)
 
-  # change column names to match data
+  # second, change column names to match data
   new_column_names = []
-  tmp_col_names = []
   for name in column_names:
-      name = process_name(name.strip().lower())
+      name = name.strip().lower()
       if 'date' in name:
-        tmp_col_names.append(name.replace('date','Days_Since').title())
-      elif 'code' in name:
-        tmp_col_names.extend(['Is_Detail_Code_' + c for c in codes])
-      elif 'ratio' in name:
+        new_column_names.append(name.replace('date','days since').title())
+      elif 'code' in name or 'grade' in name:
         pass
       else:
-        tmp_col_names.append(name.title())
+        new_column_names.append(name.title())
 
-  # second pass to make col names match phase II specification
-  new_column_names.extend(tmp_col_names[0:27]) # append static col names
-  new_column_names.extend(tmp_col_names[38:]) # append static col names
-  for i in xrange(nyears):
-    for name in tmp_col_names[27:38]: # append dynamic cols
-      if 'grade' not in name.lower(): # remove grade col
-        new_column_names.append(name + '_Year_' + str(i + 1))
-
+  new_column_names.extend(['Is Detail Code_' + c for c in codes])
   new_column_names.append('Unprocessed_Rm_Key')
   new_column_names.append('Unprocessed_Stmt_Date')
-  new_column_names.append('Financial_Grade_After_5_Years')
   
   return data_matrix, new_column_names
 
@@ -162,7 +124,7 @@ def process_raw_data(data_file):
 ######
 def preprocess_csv(csv_name, out_name):
 
-  # open input file
+  # open the file
   data_file = open(csv_name, 'r')
 
   # read and process data
@@ -171,29 +133,28 @@ def preprocess_csv(csv_name, out_name):
   finally:
     data_file.close()
 
-  # open output files
+  # open files for writing
   arffFile = open(out_name + '.arff', 'w')
   csvFile = open(out_name + '.csv', 'w')
 
   # create ARFF and CSV files from data
   try:
+    # create CSV
     csvWriter = csv.writer(csvFile, dialect='excel')
-    csvWriter.writerow(column_names)
+    # uncomment next line to write column names to first line of csv file
+    #csvWriter.writerow(column_names)
     np.savetxt(csvFile, data_matrix, fmt='%s', delimiter=',', newline='\n')
 
+    # create ARFF
     arffFile.write('@RELATION masshousingdata\n\n')
-    # column names
-    for name in column_names:
+    for i, name in enumerate(column_names):
       arffFile.write('@ATTRIBUTE ')
+      arffFile.write(process_name(name))
       if 'unprocessed' in name.lower():
-        arffFile.write(name)
         arffFile.write(' STRING\n')
-      elif 'grade' in name.lower():
-        arffFile.write('class {0,1,2,3,4}\n')
       else:
-        arffFile.write(name)
         arffFile.write(' REAL\n')
-    arffFile.write('\n')
+    arffFile.write('@ATTRIBUTE Financial_Rating {0, 1, 2, 3, 4}\n\n')
 
     # data matrix
     arffFile.write('@DATA\n')
