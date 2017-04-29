@@ -60,7 +60,54 @@ if __name__ == '__main__':
     print 'Error occurred while opening or readin file', train_csv_name
     exit(1)
 
+  five = {}
+  four = {}
+  three = {}
+  two = {}
+  one = {}
   for (key, grades) in rm_keys.iteritems():
+    if len(grades) == 5:
+      five[key] = grades
+    elif len(grades) == 4:
+      four[key] = grades
+    elif len(grades) == 3:
+      three[key] = grades
+    elif len(grades) == 2:
+      two[key] = grades
+    else:
+      one[key] = grades
+
+  print '================= KEYS WITH FIVE GRADES ================='
+  for (key, grades) in five.iteritems():
     print 'RM KEY:', key
-    for (k, v) in grades.iteritems():
-      print k, ':', v
+    for (grade, count) in grades.iteritems():
+      print grade, ':', count
+  print
+
+  print '================= KEYS WITH FOUR GRADES ================='
+  for (key, grades) in four.iteritems():
+    print 'RM KEY:', key
+    for (grade, count) in grades.iteritems():
+      print grade, ':', count
+  print
+
+  print '================= KEYS WITH THREE GRADES ================='
+  for (key, grades) in three.iteritems():
+    print 'RM KEY:', key
+    for (grade, count) in grades.iteritems():
+      print grade, ':', count
+  print
+
+  print '================= KEYS WITH TWO GRADES ================='
+  for (key, grades) in two.iteritems():
+    print 'RM KEY:', key
+    for (grade, count) in grades.iteritems():
+      print grade, ':', count
+  print
+
+  print '================= KEYS WITH ONE GRADE ================='
+  for (key, grades) in one.iteritems():
+    print 'RM KEY:', key
+    for (grade, count) in grades.iteritems():
+      print grade, ':', count
+  print
