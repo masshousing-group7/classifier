@@ -79,35 +79,59 @@ if __name__ == '__main__':
 
   print '================= KEYS WITH FIVE GRADES ================='
   for (key, grades) in five.iteritems():
+    total = 0
     print 'RM KEY:', key
     for (grade, count) in grades.iteritems():
       print grade, ':', count
+      total += count
+    print 'TOTAL:', total
+  print
+  print 'TOTAL KEYS:', len(five)
   print
 
   print '================= KEYS WITH FOUR GRADES ================='
   for (key, grades) in four.iteritems():
+    total = 0
     print 'RM KEY:', key
     for (grade, count) in grades.iteritems():
       print grade, ':', count
+      total += count
+    print 'TOTAL:', total
+  print
+  print 'TOTAL KEYS:', len(four)
   print
 
   print '================= KEYS WITH THREE GRADES ================='
   for (key, grades) in three.iteritems():
+    total = 0
     print 'RM KEY:', key
     for (grade, count) in grades.iteritems():
       print grade, ':', count
+      total += count
+    print 'TOTAL:', total
+  print
+  print 'TOTAL KEYS:', len(three)
   print
 
   print '================= KEYS WITH TWO GRADES ================='
   for (key, grades) in two.iteritems():
+    total = 0
     print 'RM KEY:', key
     for (grade, count) in grades.iteritems():
       print grade, ':', count
+      total += count
+    print 'TOTAL:', total
+  print
+  print 'TOTAL KEYS:', len(two)
   print
 
   print '================= KEYS WITH ONE GRADE ================='
   for (key, grades) in one.iteritems():
+    total = 0
     print 'RM KEY:', key
     for (grade, count) in grades.iteritems():
       print grade, ':', count
+      total += count
+    print 'TOTAL:', total
   print
+  print 'TOTAL KEYS:', len(one)
