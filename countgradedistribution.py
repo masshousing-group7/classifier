@@ -2,7 +2,8 @@
 
 ###############################################################################
 #
-# Count the grade distribution per rm_key in the raw housing data csv file.
+# Count the grade distribution per rm_key in the raw housing data csv file
+# and print to stdout.
 #
 # Usage: ./count_grade_distribution <csv file path>
 # 
