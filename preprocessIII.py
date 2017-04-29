@@ -131,9 +131,18 @@ def process_raw_data(data_file):
 ######
 def preprocess_csv(train_csv_name, test_csv_name, out_prefix):
 
-  # open the files
-  train_data_file = open(train_csv_name, 'r')
-  test_data_file = open(test_csv_name, 'r')
+  # try opening the files
+  try:
+    train_data_file = open(train_csv_name, 'r')
+  except IOError as e:
+    print 'ERROR: unable to find file', train_csv_name
+    return
+
+  try:
+    test_data_file = open(test_csv_name, 'r')
+  except IOError as e:
+    print 'ERROR: unable to find file', test_csv_name
+    return
 
   # read and process data
   try:
