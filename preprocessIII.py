@@ -24,12 +24,13 @@ def process_name(name):
   name = name.strip()
   return name.replace(' ', '_')
 
+
 # helper function to process raw data
 # takes a file pointer and returns the processed data matrix
 # and a list of column names in order
 def process_raw_data(data_file):
   today = date.today().toordinal()
-  data = []
+  train_data = []
   grades = []
   unscaled_detail_codes = []
   raw_rm_key_col = []
@@ -71,28 +72,35 @@ def process_raw_data(data_file):
           grades.append([3])
         else:
           grades.append([4])
+      elif 'rm' in c_name and 'key' in c_name: # remove rm_key
+        raw_rm_key_col.append([cols[i]])
+      elif 'ratio' in c_name: # remove current ratio and dsc ratio
+        pass
       else:
-        if 'rm' in c_name and 'key' in c_name:
-          raw_rm_key_col.append([cols[i]])
         row.append(np.nan if c_val == '' else c_val.replace(',',''))
     # convert all values to floating point numbers and append to data matrix
-    data.append(map(float, row))
+    train_data.append(map(float, row))
 
   # create numpy array from list object
-  data_matrix = np.array(data)
+  train_data_matrix = np.array(train_data)
 
   # impute missing values
   imputer = pp.Imputer(missing_values='NaN', strategy='mean', axis=0)
-  data_matrix = imputer.fit_transform(data_matrix)
+  train_data_matrix = imputer.fit_transform(train_data_matrix)
 
-  # scale features (normalization)
-  data_matrix = pp.scale(data_matrix)
+  # uncomment next two lines for standard feature scaling
+  #std_scale = pp.StandardScaler().fit(train_data_matrix)
+  #train_data_matrix = std_scale.transform(train_data_matrix)
+
+  # uncomment next two lines for minmax feature normalization
+  mean_scale = pp.MinMaxScaler().fit(train_data_matrix)
+  train_data_matrix = mean_scale.transform(train_data_matrix)
 
   # add unscaled detail codes, grades, and raw data
-  data_matrix = np.append(data_matrix, unscaled_detail_codes, axis=1)
-  data_matrix = np.append(data_matrix, raw_rm_key_col, axis=1)
-  data_matrix = np.append(data_matrix, raw_stmt_date_col, axis=1)
-  data_matrix = np.append(data_matrix, grades, axis=1)
+  train_data_matrix = np.append(train_data_matrix, unscaled_detail_codes,axis=1)
+  train_data_matrix = np.append(train_data_matrix, raw_rm_key_col, axis=1)
+  train_data_matrix = np.append(train_data_matrix, raw_stmt_date_col, axis=1)
+  train_data_matrix = np.append(train_data_matrix, grades, axis=1)
 
   # second, change column names to match data
   new_column_names = []
@@ -100,70 +108,97 @@ def process_raw_data(data_file):
       name = name.strip().lower()
       if 'date' in name:
         new_column_names.append(name.replace('date','days since').title())
-      elif 'code' in name or 'grade' in name:
+      elif 'code' in name or 'grade' in name or 'ratio' in name:
+        pass
+      elif 'rm' in name and 'key' in name: # remove rm_key
         pass
       else:
         new_column_names.append(name.title())
 
   new_column_names.extend(['Is Detail Code_' + c for c in codes])
-  new_column_names.append('Unprocessed_Rm_Key')
-  new_column_names.append('Unprocessed_Stmt_Date')
+  new_column_names.append('Raw_Rm_Key')
+  new_column_names.append('Raw_Stmt_Date')
   
-  return data_matrix, new_column_names
+  return train_data_matrix, new_column_names
 
 
 ######
 # Preprocess function
-# calling this function has the side effect of creating an ARFF file
-# named "housingdata.arff"
+# calling this function has the side effect of creating two
+# output files: 1 training, 1 test
 # 
-# takes the name of the CSV file
-#
-# returns a numpy array of scaled features where the last column is the
-# grade (0 or 1)
+# takes the name of the CSV files
 ######
-def preprocess_csv(csv_name, out_name):
+def preprocess_csv(train_csv_name, test_csv_name, out_prefix):
 
-  # open the file
-  data_file = open(csv_name, 'r')
+  # open the files
+  train_data_file = open(train_csv_name, 'r')
+  test_data_file = open(test_csv_name, 'r')
 
   # read and process data
   try:
-    data_matrix, column_names = process_raw_data(data_file)
+    train_data_matrix, train_column_names = process_raw_data(train_data_file)
+    test_data_matrix, test_column_names = process_raw_data(test_data_file)
   finally:
-    data_file.close()
+    train_data_file.close()
+    test_data_file.close()
 
   # open files for writing
-  arffFile = open(out_name + '.arff', 'w')
-  csvFile = open(out_name + '.csv', 'w')
+  train_arffFile = open(out_prefix + '_train.arff', 'w')
+  test_arffFile = open(out_prefix + '_test.arff', 'w')
+  train_csvFile = open(out_prefix + '_train.csv', 'w')
+  test_csvFile = open(out_prefix + '_test.csv', 'w')
 
   # create ARFF and CSV files from data
   try:
-    # create CSV
-    csvWriter = csv.writer(csvFile, dialect='excel')
-    # uncomment next line to write column names to first line of csv file
-    #csvWriter.writerow(column_names)
-    np.savetxt(csvFile, data_matrix, fmt='%s', delimiter=',', newline='\n')
+    # uncomment next four lines to write column names as first line of csv files
+    #train_csvWriter = csv.writer(train_csvFile, dialect='excel')
+    #test_csvWriter = csv.writer(test_csvFile, dialect='excel')
+    #train_csvWriter.writerow(train_column_names)
+    #test_csvWriter.writerow(test_column_names)
+    # write to CSVs
+    np.savetxt(train_csvFile, train_data_matrix, fmt='%s', delimiter=',',\
+                                                                   newline='\n')
+    np.savetxt(test_csvFile, test_data_matrix, fmt='%s', delimiter=',',\
+                                                                   newline='\n')
 
-    # create ARFF
-    arffFile.write('@RELATION masshousingdata\n\n')
-    for i, name in enumerate(column_names):
-      arffFile.write('@ATTRIBUTE ')
-      arffFile.write(process_name(name))
+    # create train ARFF file
+    train_arffFile.write('@RELATION masshousingdata\n\n')
+    for i, name in enumerate(train_column_names):
+      train_arffFile.write('@ATTRIBUTE ')
+      train_arffFile.write(process_name(name))
       if 'unprocessed' in name.lower():
-        arffFile.write(' STRING\n')
+        train_arffFile.write(' STRING\n')
       else:
-        arffFile.write(' REAL\n')
-    arffFile.write('@ATTRIBUTE Financial_Rating {0, 1, 2, 3, 4}\n\n')
+        train_arffFile.write(' REAL\n')
+    train_arffFile.write('@ATTRIBUTE Financial_Rating {0, 1, 2, 3, 4}\n\n')
 
-    # data matrix
-    arffFile.write('@DATA\n')
-    np.savetxt(arffFile, data_matrix, fmt='%s', delimiter=',', newline='\n')
+    # train data matrix
+    train_arffFile.write('@DATA\n')
+    np.savetxt(train_arffFile, train_data_matrix, fmt='%s', delimiter=',',\
+                                                                   newline='\n')
+
+    # create test ARFF file 
+    test_arffFile.write('@RELATION masshousingdata\n\n')
+    for i, name in enumerate(test_column_names):
+      test_arffFile.write('@ATTRIBUTE ')
+      test_arffFile.write(process_name(name))
+      if 'unprocessed' in name.lower():
+        test_arffFile.write(' STRING\n')
+      else:
+        test_arffFile.write(' REAL\n')
+    test_arffFile.write('@ATTRIBUTE Financial_Rating {0, 1, 2, 3, 4}\n\n')
+
+    # test data matrix
+    test_arffFile.write('@DATA\n')
+    np.savetxt(test_arffFile, test_data_matrix, fmt='%s', delimiter=',',\
+                                                                  newline='\n')
+
   finally:
-    arffFile.close()
-    csvFile.close()
-
-  return data_matrix
+    train_arffFile.close()
+    test_arffFile.close()
+    train_csvFile.close()
+    test_csvFile.close()
 
 ######################### END FUNCTION DEFINITIONS #########################
 
@@ -173,17 +208,23 @@ def preprocess_csv(csv_name, out_name):
 
 if __name__ == '__main__':
 
-  in_name = 'TrainingData.csv'
-  out_name = 'housingdata_train'
+  train_in_name = 'TrainingData.csv'
+  test_in_name = 'ExtraHousingData.csv'
+  out_name = 'housingdata'
 
   if len(sys.argv) < 2:
-    print 'Using default input csv file name:', in_name
+    print 'Using default input training csv file name:', train_in_name
   else:
-    in_name = sys.argv[1].strip()
+    train_in_name = sys.argv[1].strip()
     
   if len(sys.argv) < 3:
-    print 'Using default output file name:', out_name
+    print 'Using default input testing csv file name:', test_in_name
   else:
-    out_name = sys.argv[2].strip()
+    test_in_name = sys.argv[2].strip()
+    
+  if len(sys.argv) < 4:
+    print 'Using default output file prefix:', out_name
+  else:
+    out_name = sys.argv[3].strip()
 
-  preprocess_csv(in_name, out_name)
+  preprocess_csv(train_in_name, test_in_name, out_name)
