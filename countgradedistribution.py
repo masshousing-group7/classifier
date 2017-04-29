@@ -57,7 +57,7 @@ if __name__ == '__main__':
     train_data_file = open(train_in_name, 'r')
     rm_keys = count_grade_distribution(train_data_file)
   except IOError as e:
-    print 'Error occurred while opening or readin file', train_csv_name
+    print 'Error occurred while opening or reading file', train_csv_name
     exit(1)
 
   five = {}

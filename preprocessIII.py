@@ -118,6 +118,7 @@ def process_raw_data(data_file):
   new_column_names.extend(['Is Detail Code_' + c for c in codes])
   new_column_names.append('Raw_Rm_Key')
   new_column_names.append('Raw_Stmt_Date')
+  new_column_names.append('Financial_Rating')
   
   return train_data_matrix, new_column_names
 
@@ -161,10 +162,10 @@ def preprocess_csv(train_csv_name, test_csv_name, out_prefix):
   # create ARFF and CSV files from data
   try:
     # uncomment next four lines to write column names as first line of csv files
-    #train_csvWriter = csv.writer(train_csvFile, dialect='excel')
-    #test_csvWriter = csv.writer(test_csvFile, dialect='excel')
-    #train_csvWriter.writerow(train_column_names)
-    #test_csvWriter.writerow(test_column_names)
+    train_csvWriter = csv.writer(train_csvFile, dialect='excel')
+    test_csvWriter = csv.writer(test_csvFile, dialect='excel')
+    train_csvWriter.writerow(train_column_names)
+    test_csvWriter.writerow(test_column_names)
     # write to CSVs
     np.savetxt(train_csvFile, train_data_matrix, fmt='%s', delimiter=',',\
                                                                    newline='\n')
@@ -178,6 +179,8 @@ def preprocess_csv(train_csv_name, test_csv_name, out_prefix):
       train_arffFile.write(process_name(name))
       if 'unprocessed' in name.lower():
         train_arffFile.write(' STRING\n')
+      elif 'financial' in name.lower():
+        pass
       else:
         train_arffFile.write(' REAL\n')
     train_arffFile.write('@ATTRIBUTE Financial_Rating {0, 1, 2, 3, 4}\n\n')
@@ -194,6 +197,8 @@ def preprocess_csv(train_csv_name, test_csv_name, out_prefix):
       test_arffFile.write(process_name(name))
       if 'unprocessed' in name.lower():
         test_arffFile.write(' STRING\n')
+      elif 'financial' in name.lower():
+        pass
       else:
         test_arffFile.write(' REAL\n')
     test_arffFile.write('@ATTRIBUTE Financial_Rating {0, 1, 2, 3, 4}\n\n')
