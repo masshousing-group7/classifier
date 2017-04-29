@@ -12,6 +12,7 @@
 import sys
 import os.path
 import csv
+from sets import Set
 
 ######################## BEGIN FUNCTION DEFINITIONS ########################
 
@@ -76,6 +77,38 @@ if __name__ == '__main__':
       two[key] = grades
     else:
       one[key] = grades
+
+  # uncoment this section to see grade distribution for selected rm_keys
+  #validation_rm_keys = Set([769,774,1164,1048,786,660,792,1050,796,674,675,\
+  #                          808,682,699,700,703,707,840,976,632,803,980,\
+  #                          755,759,640,259,780,653,655,784,1042,771,789,\
+  #                          783,805,992,749,1008,1143,766])
+
+  #As = 0
+  #Bs = 0
+  #Cs = 0
+  #Ds = 0
+  #Fs = 0
+  #for key in validation_rm_keys:
+  #  for (k,v) in rm_keys[key].iteritems():
+  #    if k == 'A':
+  #      As += v
+  #    elif k == 'B':
+  #      Bs += v
+  #    elif k == 'C':
+  #      Cs += v
+  #    elif k == 'D':
+  #      Ds += v
+  #    else:
+  #      Fs += v
+
+  #print 'As', As
+  #print 'Bs', Bs
+  #print 'Cs', Cs
+  #print 'Ds', Ds
+  #print 'Fs', Fs
+  #exit(0)
+  # end testing
 
   print '================= KEYS WITH FIVE GRADES ================='
   for (key, grades) in five.iteritems():
