@@ -43,7 +43,7 @@ def write_arff(file, col_names, data_matrix):
 
   # write data matrix
   file.write('@DATA\n')
-  np.savetxt(file, data_matrix, fmt='%s', delimiter=',',\ newline='\n')
+  np.savetxt(file, data_matrix, fmt='%s', delimiter=',', newline='\n')
 
 # helper function to process raw data
 # takes a file pointer and returns the processed data matrix
