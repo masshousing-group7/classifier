@@ -13,6 +13,7 @@ import sys
 import os.path
 import csv
 from sets import Set
+from preprocessIII import write_arff
 
 ######################## BEGIN FUNCTION DEFINITIONS ##########################
 
@@ -50,7 +51,8 @@ def split_training_data(data_file, out_name_prefix):
   try:
     validation_file = open(validation_out, 'w')
     train_file = open(train_out, 'w')
-    # write files here
+    write_arff(train_file, column_names, training_set)
+    write_arff(validation_file, column_names, validation_set)
   except IOError as e:
     print 'Error occurred writing files', validation_out, 'and', train_out
 
@@ -71,7 +73,7 @@ if __name__ == '__main__':
     train_in_name = sys.argv[1].strip()
 
   if len(sys.argv) < 3:
-    out_name = 'housingdata_train_split'
+    out_name = 'housingdata_split'
   else:
     out_name = sys.argv[2].strip()
     
