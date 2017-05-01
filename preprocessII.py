@@ -39,6 +39,7 @@ def process_raw_data(data_file):
   data = []
   tenth_year_grades = []
   unscaled_rm_key_col = []
+  # unscaled_owner_key_col = []
   unscaled_stmt_year = []
   rm_map = {}
   column_names = data_file.readline().strip().split(',')
@@ -91,6 +92,7 @@ def process_raw_data(data_file):
             five_years_data.append(val)
       data.append(map(float, five_years_data)) # append data to data matrix
       unscaled_rm_key_col.append([rows[9][0]]) # store original rm_key
+      # unscaled_owner_key_col.append([rows[][]])
       orig_date = date.fromordinal(today - rows[9][27])
       unscaled_stmt_year.append([orig_date.year]) # store stmt year
       letter_grade = rows[9][28] # store letter grade
@@ -120,6 +122,7 @@ def process_raw_data(data_file):
   data_matrix = np.append(data_matrix, unscaled_rm_key_col, axis=1)
   data_matrix = np.append(data_matrix, unscaled_stmt_year, axis=1)
   data_matrix = np.append(data_matrix, tenth_year_grades, axis=1)
+  # data_matrix = np.append(data_matrix, unscaled_owner_key_col, axis=1)
 
   # change column names to match data
   new_column_names = []

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 ##############################################################################
 # Perform attribute ranking on the data set
@@ -53,8 +53,8 @@ if __name__ == '__main__':
     filter.inputformat(data)
     filtered_data = filter.filter(data)
 
-    print rank_attributes(filtered_data)
-  except Exception, e:
+    print(rank_attributes(filtered_data))
+  except Exception as e:
     print(traceback.format_exc())
   finally:
     jvm.stop()

@@ -21,6 +21,7 @@ from weka.filters import Filter
 from preprocessII import preprocess_csv
 from crossvalidation import cross_validate
 from attribute_ranking import rank_attributes
+from pprint import pprint
 
 # function to translate the grade
 def get_grade(grade):
@@ -58,6 +59,7 @@ def classify_data_knn(data_set_train, data_set_test, neighbors_number):
     features = features[0:n]
     features = map(lambda e: e + 1, features) # index offset by 1
     features.extend([113])
+    # pprint(features)
     feature_string = ','.join(map(str, features))
     print 'Feature indices kept:', feature_string
     remove = Filter(classname="weka.filters.unsupervised.attribute.Remove",\
@@ -70,19 +72,19 @@ def classify_data_knn(data_set_train, data_set_test, neighbors_number):
     fc.build_classifier(train)
 
     # print false prediction to false_predictions.txt
-    #f = open('false_predictions.txt','w')
-    ##for index, inst in enumerate(test):
-    #for index, inst in enumerate(train):
-    #    # predict the grade
-    #    prediction = fc.classify_instance(inst)
-    #    
-    #    #if a predicted value doesn't match an actual grade
-    #    if (inst.get_value(inst.class_index) != prediction):
-    #        f.write(" Rm_key: " + str(inst.get_string_value(72)) +  
-    #                " Stmt_date: " + str(inst.get_string_value(73)) +
-    #                " expected grade: " + get_grade(inst.get_value(inst.class_index)) +
-    #                " predicted grade: " + get_grade(prediction) + '\n')
-    #f.close()
+    f = open('false_predictions.txt','w')
+    #for index, inst in enumerate(test):
+    for index, inst in enumerate(train):
+       # predict the grade
+       prediction = fc.classify_instance(inst)
+       
+       #if a predicted value doesn't match an actual grade
+       if (inst.get_value(inst.class_index) != prediction):
+           f.write(" Rm_key: " + str(inst.get_string_value(72)) +  
+                   " Stmt_date: " + str(inst.get_string_value(73)) +
+                   " expected grade: " + get_grade(inst.get_value(inst.class_index)) +
+                   " predicted grade: " + get_grade(prediction) + '\n')
+    f.close()
 
     # evaluate classifier	
     cross_validate(data_set_train, 5, neighbors_number)
@@ -106,7 +108,7 @@ def main():
         if len(sys.argv) > 1:
           csv_name = sys.argv[1].strip()
         preprocess_csv(csv_name, 'housingdata_train.arff')
-        #preprocess_csv(csv_name, 'housingdata_test.arff') 
+        preprocess_csv(csv_name, 'housingdata_test.arff') 
         
         # number of neighbors for KNN
         k = 3
