@@ -17,6 +17,42 @@ from sets import Set
 ######################## BEGIN FUNCTION DEFINITIONS ########################
 
 # helper function to break down the grade distribution per rm key
+# after limiting A observations to only those records with DSC
+# ratio between 1.5 and 3.0 (inclusive)
+def count_limited_distribution(data_file):
+  lower = 1.5
+  upper = 3.0
+  grade_dist = {}
+  data_file.readline() # discard column names
+  reader = csv.reader(data_file, dialect='excel')
+
+  # iterate over raw data
+  for cols in reader:
+    rm_key = int(cols[0]) # rm key is column 0
+    grade = cols[7].strip().upper() # letter grade is column 7
+    dsc = float(cols[8]) # dsc ratio is column 8
+    if grade == 'A':
+      if lower <= dsc and dsc <= upper:
+        if rm_key not in grade_dist:
+          grade_dist[rm_key] = {grade: 1}
+        elif grade not in grade_dist[rm_key]:
+          grade_dist[rm_key][grade] = 1
+        else:
+          grade_dist[rm_key][grade] += 1
+      else: # ignore A records outside our range
+        pass
+    else:
+      if rm_key not in grade_dist:
+        grade_dist[rm_key] = {grade: 1}
+      elif grade not in grade_dist[rm_key]:
+        grade_dist[rm_key][grade] = 1
+      else:
+        grade_dist[rm_key][grade] += 1
+
+  return grade_dist
+
+
+# helper function to break down the grade distribution per rm key
 # returns a mapping of rm_keys to their grade distributions
 def count_grade_distribution(data_file):
   grade_dist = {}
@@ -27,13 +63,12 @@ def count_grade_distribution(data_file):
   for cols in reader:
     rm_key = int(cols[0]) # rm key is column 0
     grade = cols[7].strip().upper() # letter grade is column 7
-    if rm_key in grade_dist:
-      if grade in grade_dist[rm_key]:
-        grade_dist[rm_key][grade] += 1
-      else:
-        grade_dist[rm_key][grade] = 1
-    else:
+    if rm_key not in grade_dist:
       grade_dist[rm_key] = {grade: 1}
+    elif grade not in grade_dist[rm_key]:
+      grade_dist[rm_key][grade] = 1
+    else:
+      grade_dist[rm_key][grade] += 1
 
   return grade_dist
 
@@ -79,35 +114,35 @@ if __name__ == '__main__':
       one[key] = grades
 
   # uncoment this section to see grade distribution for selected rm_keys
-  #validation_rm_keys = Set([769,774,1164,1048,786,660,792,1050,796,674,675,\
-  #                          808,682,699,700,703,707,840,976,632,803,980,\
-  #                          755,759,640,259,780,653,655,784,1042,771,789,\
-  #                          783,805,992,749,1008,1143,766])
+  validation_rm_keys = Set([769,774,1164,1048,786,660,792,1050,796,674,675,\
+                            808,682,699,700,703,707,840,976,632,803,980,\
+                            755,759,640,259,780,653,655,784,1042,771,789,\
+                            783,805,992,749,1008,1143,766])
 
-  #As = 0
-  #Bs = 0
-  #Cs = 0
-  #Ds = 0
-  #Fs = 0
-  #for key in validation_rm_keys:
-  #  for (k,v) in rm_keys[key].iteritems():
-  #    if k == 'A':
-  #      As += v
-  #    elif k == 'B':
-  #      Bs += v
-  #    elif k == 'C':
-  #      Cs += v
-  #    elif k == 'D':
-  #      Ds += v
-  #    else:
-  #      Fs += v
+  As = 0
+  Bs = 0
+  Cs = 0
+  Ds = 0
+  Fs = 0
+  for key in validation_rm_keys:
+    for (k,v) in rm_keys[key].iteritems():
+      if k == 'A':
+        As += v
+      elif k == 'B':
+        Bs += v
+      elif k == 'C':
+        Cs += v
+      elif k == 'D':
+        Ds += v
+      else:
+        Fs += v
 
-  #print 'As', As
-  #print 'Bs', Bs
-  #print 'Cs', Cs
-  #print 'Ds', Ds
-  #print 'Fs', Fs
-  #exit(0)
+  print 'As', As
+  print 'Bs', Bs
+  print 'Cs', Cs
+  print 'Ds', Ds
+  print 'Fs', Fs
+  exit(0)
   # end testing
 
   print '================= KEYS WITH FIVE GRADES ================='
