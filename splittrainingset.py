@@ -5,7 +5,7 @@
 # Split the training set into training set and validation using a predetermined
 # set of rm_keys.
 #
-# Usage: ./splittrainingset <csv file path>
+# Usage: ./splittrainingset <in csv file path> <out arff file name>
 # 
 ###############################################################################
 
@@ -17,7 +17,8 @@ from sets import Set
 ######################## BEGIN FUNCTION DEFINITIONS ##########################
 
 # helper function to split the training data into training and validation sets
-def split_training_data(data_file):
+# has the side effect of creating two arff files
+def split_training_data(data_file, out_name_prefix):
   # selected rm keys based on count grade distribution script
   # using these keys for validation leaves us with 579 validation examples
   validation_rm_keys = Set([769,774,1164,1048,786,660,792,1050,796,674,675,\
@@ -43,6 +44,16 @@ def split_training_data(data_file):
     else:
       training_set.append(cols)
 
+  # try opening output arff files
+  validation_out = out_name_prefix + '_validation.arff'
+  train_out = out_name_prefix + '_train.arff'
+  try:
+    validation_file = open(validation_out, 'w')
+    train_file = open(train_out, 'w')
+    # write files here
+  except IOError as e:
+    print 'Error occurred writing files', validation_out, 'and', train_out
+
   return training_set, validation_set
 
 
@@ -58,13 +69,19 @@ if __name__ == '__main__':
     train_in_name = 'housingdata_train.csv'
   else:
     train_in_name = sys.argv[1].strip()
-    
-  print 'Using csv file name:', train_in_name
 
-  # try opening the file
+  if len(sys.argv) < 3:
+    out_name = 'housingdata_train_split'
+  else:
+    out_name = sys.argv[2].strip()
+    
+  print 'Using input csv file name:', train_in_name
+  print 'Using output arff file name:', out_name
+
+  # try opening the input file
   try:
     train_data_file = open(train_in_name, 'r')
-    train_set, validation_set = split_training_data(train_data_file)
+    train_set, validation_set = split_training_data(train_data_file, out_name)
   except IOError as e:
     print 'Error occurred while opening or reading file', train_csv_name
     exit(1)

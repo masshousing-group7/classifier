@@ -25,6 +25,26 @@ def process_name(name):
   return name.replace(' ', '_')
 
 
+# helper function to create an arff file
+def write_arff(file, col_names, data_matrix):
+
+  # write header information
+  file.write('@RELATION masshousingdata\n\n')
+  for i, name in enumerate(col_names):
+    file.write('@ATTRIBUTE ')
+    file.write(process_name(name))
+    if 'unprocessed' in name.lower():
+      file.write(' STRING\n')
+    elif 'financial' in name.lower():
+      pass
+    else:
+      file.write(' REAL\n')
+  file.write('@ATTRIBUTE Financial_Rating {0, 1, 2, 3, 4}\n\n')
+
+  # write data matrix
+  file.write('@DATA\n')
+  np.savetxt(file, data_matrix, fmt='%s', delimiter=',',\ newline='\n')
+
 # helper function to process raw data
 # takes a file pointer and returns the processed data matrix
 # and a list of column names in order
@@ -161,7 +181,8 @@ def preprocess_csv(train_csv_name, test_csv_name, out_prefix):
 
   # create ARFF and CSV files from data
   try:
-    # uncomment next four lines to write column names as first line of csv files
+
+    # write column names as first line of csv files
     train_csvWriter = csv.writer(train_csvFile, dialect='excel')
     test_csvWriter = csv.writer(test_csvFile, dialect='excel')
     train_csvWriter.writerow(train_column_names)
@@ -172,41 +193,9 @@ def preprocess_csv(train_csv_name, test_csv_name, out_prefix):
     np.savetxt(test_csvFile, test_data_matrix, fmt='%s', delimiter=',',\
                                                                    newline='\n')
 
-    # create train ARFF file
-    train_arffFile.write('@RELATION masshousingdata\n\n')
-    for i, name in enumerate(train_column_names):
-      train_arffFile.write('@ATTRIBUTE ')
-      train_arffFile.write(process_name(name))
-      if 'unprocessed' in name.lower():
-        train_arffFile.write(' STRING\n')
-      elif 'financial' in name.lower():
-        pass
-      else:
-        train_arffFile.write(' REAL\n')
-    train_arffFile.write('@ATTRIBUTE Financial_Rating {0, 1, 2, 3, 4}\n\n')
-
-    # train data matrix
-    train_arffFile.write('@DATA\n')
-    np.savetxt(train_arffFile, train_data_matrix, fmt='%s', delimiter=',',\
-                                                                   newline='\n')
-
-    # create test ARFF file 
-    test_arffFile.write('@RELATION masshousingdata\n\n')
-    for i, name in enumerate(test_column_names):
-      test_arffFile.write('@ATTRIBUTE ')
-      test_arffFile.write(process_name(name))
-      if 'unprocessed' in name.lower():
-        test_arffFile.write(' STRING\n')
-      elif 'financial' in name.lower():
-        pass
-      else:
-        test_arffFile.write(' REAL\n')
-    test_arffFile.write('@ATTRIBUTE Financial_Rating {0, 1, 2, 3, 4}\n\n')
-
-    # test data matrix
-    test_arffFile.write('@DATA\n')
-    np.savetxt(test_arffFile, test_data_matrix, fmt='%s', delimiter=',',\
-                                                                  newline='\n')
+    # create train and test arff files
+    write_arff(train_arffFile, train_column_names, train_data_matrix)
+    write_arff(test_arffFile, test_column_names, test_data_matrix)
 
   finally:
     train_arffFile.close()
