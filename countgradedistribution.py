@@ -91,115 +91,213 @@ if __name__ == '__main__':
   # try opening the file
   try:
     train_data_file = open(train_in_name, 'r')
-    rm_keys = count_grade_distribution(train_data_file)
+    all_rm_keys = count_grade_distribution(train_data_file)
+    # 'rewind' file here
+    train_data_file.seek(0)
+    limited_rm_keys = count_limited_distribution(train_data_file)
   except IOError as e:
     print 'Error occurred while opening or reading file', train_csv_name
     exit(1)
 
-  five = {}
-  four = {}
-  three = {}
-  two = {}
-  one = {}
-  for (key, grades) in rm_keys.iteritems():
-    if len(grades) == 5:
-      five[key] = grades
-    elif len(grades) == 4:
-      four[key] = grades
-    elif len(grades) == 3:
-      three[key] = grades
-    elif len(grades) == 2:
-      two[key] = grades
-    else:
-      one[key] = grades
+  # tally grades in all_rm_key set
+  all_As = 0
+  all_Bs = 0
+  all_Cs = 0
+  all_Ds = 0
+  all_Fs = 0
+  print 'GRADE DISTRIBUTION IN ALL RM_KEYS'
+  for (key, grades) in all_rm_keys.iteritems():
+    for (k, v) in grades.iteritems():
+      if k == 'A':
+        all_As += v
+      elif k == 'B':
+        all_Bs += v
+      elif k == 'C':
+        all_Cs += v
+      elif k == 'D':
+        all_Ds += v
+      else:
+        all_Fs += v
 
-  # uncoment this section to see grade distribution for selected rm_keys
+  print 'all_As', all_As
+  print 'all_Bs', all_Bs
+  print 'all_Cs', all_Cs
+  print 'all_Ds', all_Ds
+  print 'all_Fs', all_Fs
+  print
+
+  # tally grades in limited_rm_key set
+  limited_As = 0
+  limited_Bs = 0
+  limited_Cs = 0
+  limited_Ds = 0
+  limited_Fs = 0
+  print 'GRADE DISTRIBUTION IN LIMITED RM_KEYS'
+  for (key, grades) in limited_rm_keys.iteritems():
+    for (k, v) in grades.iteritems():
+      if k == 'A':
+        limited_As += v
+      elif k == 'B':
+        limited_Bs += v
+      elif k == 'C':
+        limited_Cs += v
+      elif k == 'D':
+        limited_Ds += v
+      else:
+        limited_Fs += v
+
+  print 'limited_As', limited_As
+  print 'limited_Bs', limited_Bs
+  print 'limited_Cs', limited_Cs
+  print 'limited_Ds', limited_Ds
+  print 'limited_Fs', limited_Fs
+  print
+
+  # selected rm_keys
   validation_rm_keys = Set([769,774,1164,1048,786,660,792,1050,796,674,675,\
                             808,682,699,700,703,707,840,976,632,803,980,\
                             755,759,640,259,780,653,655,784,1042,771,789,\
                             783,805,992,749,1008,1143,766])
 
-  As = 0
-  Bs = 0
-  Cs = 0
-  Ds = 0
-  Fs = 0
+  # uncoment this section to see grade distribution for selected rm_keys in
+  # all_rm_key set
+  all_As = 0
+  all_Bs = 0
+  all_Cs = 0
+  all_Ds = 0
+  all_Fs = 0
+  print 'GRADE DISTRIBUTION FOR SELECTED KEYS IN ALL_RM_KEY SET'
   for key in validation_rm_keys:
-    for (k,v) in rm_keys[key].iteritems():
+    for (k,v) in all_rm_keys[key].iteritems():
       if k == 'A':
-        As += v
+        all_As += v
       elif k == 'B':
-        Bs += v
+        all_Bs += v
       elif k == 'C':
-        Cs += v
+        all_Cs += v
       elif k == 'D':
-        Ds += v
+        all_Ds += v
       else:
-        Fs += v
+        all_Fs += v
 
-  print 'As', As
-  print 'Bs', Bs
-  print 'Cs', Cs
-  print 'Ds', Ds
-  print 'Fs', Fs
-  exit(0)
-  # end testing
+  print 'all_As', all_As
+  print 'all_Bs', all_Bs
+  print 'all_Cs', all_Cs
+  print 'all_Ds', all_Ds
+  print 'all_Fs', all_Fs
+  print
+  # end selected rm_keys distribution in all_rm_key set
 
-  print '================= KEYS WITH FIVE GRADES ================='
-  for (key, grades) in five.iteritems():
-    total = 0
-    print 'RM KEY:', key
-    for (grade, count) in grades.iteritems():
-      print grade, ':', count
-      total += count
-    print 'TOTAL:', total
-  print
-  print 'TOTAL KEYS:', len(five)
-  print
+  # uncoment this section to see grade distribution for selected rm_keys in
+  # limited_rm_key set
+  limited_As = 0
+  limited_Bs = 0
+  limited_Cs = 0
+  limited_Ds = 0
+  limited_Fs = 0
+  print 'GRADE DISTRIBUTION FOR SELECTED KEYS IN LIMITED_RM_KEY SET'
+  for key in validation_rm_keys:
+    for (k,v) in limited_rm_keys[key].iteritems():
+      if k == 'A':
+        limited_As += v
+      elif k == 'B':
+        limited_Bs += v
+      elif k == 'C':
+        limited_Cs += v
+      elif k == 'D':
+        limited_Ds += v
+      else:
+        limited_Fs += v
 
-  print '================= KEYS WITH FOUR GRADES ================='
-  for (key, grades) in four.iteritems():
-    total = 0
-    print 'RM KEY:', key
-    for (grade, count) in grades.iteritems():
-      print grade, ':', count
-      total += count
-    print 'TOTAL:', total
-  print
-  print 'TOTAL KEYS:', len(four)
-  print
+  print 'limited_As', limited_As
+  print 'limited_Bs', limited_Bs
+  print 'limited_Cs', limited_Cs
+  print 'limited_Ds', limited_Ds
+  print 'limited_Fs', limited_Fs
+  # end selected rm_keys distribution in limited_rm_key set
 
-  print '================= KEYS WITH THREE GRADES ================='
-  for (key, grades) in three.iteritems():
-    total = 0
-    print 'RM KEY:', key
-    for (grade, count) in grades.iteritems():
-      print grade, ':', count
-      total += count
-    print 'TOTAL:', total
-  print
-  print 'TOTAL KEYS:', len(three)
-  print
 
-  print '================= KEYS WITH TWO GRADES ================='
-  for (key, grades) in two.iteritems():
-    total = 0
-    print 'RM KEY:', key
-    for (grade, count) in grades.iteritems():
-      print grade, ':', count
-      total += count
-    print 'TOTAL:', total
-  print
-  print 'TOTAL KEYS:', len(two)
-  print
+  # this section prints the grade distrubtion for each rm_key
+  # in a given set (either the limited set or over all rm_keys)
+  # uncomment to print distribution for each rm_key
+  #print
+  #five = {}
+  #four = {}
+  #three = {}
+  #two = {}
+  #one = {}
+  # uncomment for grade distribution of selected rm_keys
+  # in all_rm_key set
+  #for (key, grades) in all_rm_keys.iteritems():
+  # uncomment for grade distribution of selected rm_keys
+  # in limited_rm_key set
+  #for (key, grades) in limited_rm_keys.iteritems():
+  #  if len(grades) == 5:
+  #    five[key] = grades
+  #  elif len(grades) == 4:
+  #    four[key] = grades
+  #  elif len(grades) == 3:
+  #    three[key] = grades
+  #  elif len(grades) == 2:
+  #    two[key] = grades
+  #  else:
+  #    one[key] = grades
+  #
+  #print '================= KEYS WITH FIVE GRADES ================='
+  #for (key, grades) in all_five.iteritems():
+  #  total = 0
+  #  print 'RM KEY:', key
+  #  for (grade, count) in grades.iteritems():
+  #    print grade, ':', count
+  #    total += count
+  #  print 'TOTAL:', total
+  #print
+  #print 'TOTAL KEYS:', len(all_five)
+  #print
 
-  print '================= KEYS WITH ONE GRADE ================='
-  for (key, grades) in one.iteritems():
-    total = 0
-    print 'RM KEY:', key
-    for (grade, count) in grades.iteritems():
-      print grade, ':', count
-      total += count
-    print 'TOTAL:', total
-  print
-  print 'TOTAL KEYS:', len(one)
+  #print '================= KEYS WITH FOUR GRADES ================='
+  #for (key, grades) in all_four.iteritems():
+  #  total = 0
+  #  print 'RM KEY:', key
+  #  for (grade, count) in grades.iteritems():
+  #    print grade, ':', count
+  #    total += count
+  #  print 'TOTAL:', total
+  #print
+  #print 'TOTAL KEYS:', len(all_four)
+  #print
+
+  #print '================= KEYS WITH THREE GRADES ================='
+  #for (key, grades) in all_three.iteritems():
+  #  total = 0
+  #  print 'RM KEY:', key
+  #  for (grade, count) in grades.iteritems():
+  #    print grade, ':', count
+  #    total += count
+  #  print 'TOTAL:', total
+  #print
+  #print 'TOTAL KEYS:', len(all_three)
+  #print
+
+  #print '================= KEYS WITH TWO GRADES ================='
+  #for (key, grades) in all_two.iteritems():
+  #  total = 0
+  #  print 'RM KEY:', key
+  #  for (grade, count) in grades.iteritems():
+  #    print grade, ':', count
+  #    total += count
+  #  print 'TOTAL:', total
+  #print
+  #print 'TOTAL KEYS:', len(all_two)
+  #print
+
+  #print '================= KEYS WITH ONE GRADE ================='
+  #for (key, grades) in all_one.iteritems():
+  #  total = 0
+  #  print 'RM KEY:', key
+  #  for (grade, count) in grades.iteritems():
+  #    print grade, ':', count
+  #    total += count
+  #  print 'TOTAL:', total
+  #print
+  #print 'TOTAL KEYS:', len(all_one)
