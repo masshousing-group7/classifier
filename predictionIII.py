@@ -155,11 +155,11 @@ def main():
         print 'MultiClassClassifier with original training and testing datasets'
         classify_data('housingdata_train.arff', 'housingdata_test.arff', '1_MultiClass_false_predictions_phaseIII.txt')
         print 'MultiClassClassifier with produced training and testing datasets from original training dataset'
-        classify_data("train_splitted.arff", "test_splitted.arff", '2_MultiClass_false_predictions_phaseIII.txt')
+        classify_data("housingdata_split_train.arff", "housingdata_split_validation.arff", '2_MultiClass_false_predictions_phaseIII.txt')
         print 'KNN Classifier with original training and testing datasets'
         classify_data_knn('housingdata_train.arff', 'housingdata_test.arff', '1_IBk_false_predictions_phaseIII.txt',1)
         print 'KNN Classifier with produced training and testing datasets from original training dataset'
-        classify_data_knn("train_splitted.arff", "test_splitted.arff", '2_IBk_false_predictions_phaseIII.txt',1)
+        classify_data_knn("housingdata_split_train.arff", "housingdata_split_validation.arff", '2_IBk_false_predictions_phaseIII.txt',1)
 		
     except Exception, e:
          print(traceback.format_exc())

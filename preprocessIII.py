@@ -65,40 +65,43 @@ def process_raw_data(data_file):
 
   # first, build matrix of floating point values from raw data
   for cols in reader:
-    row = []
-    for i in xrange(len(cols)):
-      c_name = column_names[i].strip().lower()
-      c_val = cols[i].strip().upper()
-      if 'date' in c_name: # handle date column
-        if 'stmt' in c_name:
-          raw_stmt_date_col.append([cols[i]])
-        mdy = c_val.split('/')
-        d = date(int(mdy[2]), int(mdy[0]), int(mdy[1])).toordinal()
-        row.append(today - d)
-      elif 'code' in c_name: # handle detail code column
-        detail_codes = []
-        for code in codes:
-          detail_codes.append(1 if c_val == code else 0)
-        unscaled_detail_codes.append(detail_codes)
-      elif 'grade' in c_name: # handle financial rating column
-        if c_val == 'A':
-          grades.append([0])
-        elif c_val == 'B':
-          grades.append([1])
-        elif c_val == 'C':
-          grades.append([2])
-        elif c_val == 'D':
-          grades.append([3])
+    grade = cols[7].strip().upper() # letter grade is column 7
+    dsc = float(cols[8]) # dsc ratio is column 8
+    if grade != 'A' or 1.5 <= dsc and dsc <= 3.0:
+      row = []
+      for i in xrange(len(cols)):
+        c_name = column_names[i].strip().lower()
+        c_val = cols[i].strip().upper()
+        if 'date' in c_name: # handle date column
+          if 'stmt' in c_name:
+            raw_stmt_date_col.append([cols[i]])
+          mdy = c_val.split('/')
+          d = date(int(mdy[2]), int(mdy[0]), int(mdy[1])).toordinal()
+          row.append(today - d)
+        elif 'code' in c_name: # handle detail code column
+          detail_codes = []
+          for code in codes:
+            detail_codes.append(1 if c_val == code else 0)
+          unscaled_detail_codes.append(detail_codes)
+        elif 'grade' in c_name: # handle financial rating column
+          if c_val == 'A':
+            grades.append([0])
+          elif c_val == 'B':
+            grades.append([1])
+          elif c_val == 'C':
+            grades.append([2])
+          elif c_val == 'D':
+            grades.append([3])
+          else:
+            grades.append([4])
+        elif 'rm' in c_name and 'key' in c_name: # remove rm_key
+          raw_rm_key_col.append([cols[i]])
+        elif 'ratio' in c_name: # remove current ratio and dsc ratio
+          pass
         else:
-          grades.append([4])
-      elif 'rm' in c_name and 'key' in c_name: # remove rm_key
-        raw_rm_key_col.append([cols[i]])
-      elif 'ratio' in c_name: # remove current ratio and dsc ratio
-        pass
-      else:
-        row.append(np.nan if c_val == '' else c_val.replace(',',''))
-    # convert all values to floating point numbers and append to data matrix
-    train_data.append(map(float, row))
+          row.append(np.nan if c_val == '' else c_val.replace(',',''))
+      # convert all values to floating point numbers and append to data matrix
+      train_data.append(map(float, row))
 
   # create numpy array from list object
   train_data_matrix = np.array(train_data)
