@@ -65,9 +65,9 @@ def process_raw_data(data_file):
 
   # first, build matrix of floating point values from raw data
   for cols in reader:
-    grade = cols[7].strip().upper() # letter grade is column 7
-    dsc = float(cols[8]) # dsc ratio is column 8
-    if grade != 'A' or 1.5 <= dsc and dsc <= 3.0:
+    #grade = cols[7].strip().upper() # letter grade is column 7
+    #dsc = float(cols[8]) # dsc ratio is column 8
+    #if grade != 'A' or 1.5 <= dsc and dsc <= 3.0:
       row = []
       for i in xrange(len(cols)):
         c_name = column_names[i].strip().lower()
