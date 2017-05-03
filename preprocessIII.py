@@ -31,14 +31,13 @@ def write_arff(file, col_names, data_matrix):
   # write header information
   file.write('@RELATION masshousingdata\n\n')
   for i, name in enumerate(col_names):
-    file.write('@ATTRIBUTE ')
-    file.write(process_name(name))
-    if 'unprocessed' in name.lower():
-      file.write(' STRING\n')
-    elif 'financial' in name.lower():
-      pass
-    else:
-      file.write(' REAL\n')
+    if 'financial' not in name.lower():
+      file.write('@ATTRIBUTE ')
+      file.write(process_name(name))
+      if 'unprocessed' in name.lower():
+        file.write(' STRING\n')
+      else:
+        file.write(' REAL\n')
   file.write('@ATTRIBUTE Financial_Rating {0, 1, 2, 3, 4}\n\n')
 
   # write data matrix
