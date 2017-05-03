@@ -34,7 +34,7 @@ def write_arff(file, col_names, data_matrix):
     if 'financial' not in name.lower():
       file.write('@ATTRIBUTE ')
       file.write(process_name(name))
-      if 'unprocessed' in name.lower():
+      if 'raw' in name.lower():
         file.write(' STRING\n')
       else:
         file.write(' REAL\n')
