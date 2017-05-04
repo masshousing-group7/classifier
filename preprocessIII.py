@@ -12,6 +12,7 @@ import sys
 import os.path
 import csv
 import numpy as np
+import new_features
 from datetime import date
 from sklearn import preprocessing as pp
 
@@ -213,23 +214,25 @@ def preprocess_csv(train_csv_name, test_csv_name, out_prefix):
 
 if __name__ == '__main__':
 
+  new_train_in_name = new_features.getNewFeaturesAndFilename('TrainingData.csv')
+  new_test_in_name = new_features.getNewFeaturesAndFilename('ExtraHousingData.csv')
   train_in_name = 'TrainingData.csv'
   test_in_name = 'ExtraHousingData.csv'
   out_name = 'housingdata'
 
   if len(sys.argv) < 2:
-    print 'Using default input training csv file name:', train_in_name
+    print 'Using default input training csv file name:', new_train_in_name
   else:
-    train_in_name = sys.argv[1].strip()
+    new_train_in_name = sys.argv[1].strip()
     
   if len(sys.argv) < 3:
-    print 'Using default input testing csv file name:', test_in_name
+    print 'Using default input testing csv file name:', new_test_in_name
   else:
-    test_in_name = sys.argv[2].strip()
+    new_test_in_name = sys.argv[2].strip()
     
   if len(sys.argv) < 4:
     print 'Using default output file prefix:', out_name
   else:
     out_name = sys.argv[3].strip()
 
-  preprocess_csv(train_in_name, test_in_name, out_name)
+  preprocess_csv(new_train_in_name, new_test_in_name, out_name)
