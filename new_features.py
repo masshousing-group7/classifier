@@ -6,13 +6,17 @@
 
 import csv
 import time
+import locale
+LANGUAGE="en_US.UTF-8"
+LC_ALL="en_US.UTF-8"
+# locale.setlocale( locale.LC_ALL, 'en_US.UTF-8' )
+locale.setlocale(locale.LC_ALL, 'american english')
 
 oldfile = ""
 statements = {}
 headers = []
 newheaders = []
-new_features = 
-['change_housing_index',
+new_features = ['change_housing_index',
  'perc_low_income',
  'perc_mod_income',
  'perc_market_rate',
@@ -49,29 +53,29 @@ home_price_index = {
     "1991": -0.198,
     "1992": 0.055,
     "1993": 0.171,
-    "1994": 0.188
-    "1995": 0.124
-    "1996": 0.328
-    "1997": 0.423
-    "1998": 0.709
-    "1999": 1.048
-    "2000": 1.383
-    "2001": 1.130
-    "2002": 1.446
-    "2003": 0.953
-    "2004": 1.252
-    "2005": 0.509
-    "2006": -0.763
-    "2007": -0.480
-    "2008": -0.961
-    "2009": 0.068
-    "2010": -0.096
-    "2011": -0.324
-    "2012": 0.452
-    "2013": 1.251
-    "2014": 0.527
-    "2015": 0.651
-    "2016": 0.953
+    "1994": 0.188,
+    "1995": 0.124,
+    "1996": 0.328,
+    "1997": 0.423,
+    "1998": 0.709,
+    "1999": 1.048,
+    "2000": 1.383,
+    "2001": 1.130,
+    "2002": 1.446,
+    "2003": 0.953,
+    "2004": 1.252,
+    "2005": 0.509,
+    "2006": -0.763,
+    "2007": -0.480,
+    "2008": -0.961,
+    "2009": 0.068,
+    "2010": -0.096,
+    "2011": -0.324,
+    "2012": 0.452,
+    "2013": 1.251,
+    "2014": 0.527,
+    "2015": 0.651,
+    "2016": 0.953,
 }
 
 
@@ -106,7 +110,7 @@ def csvToDict(some_csv):
     with open(some_csv) as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
-            if count == 0:
+            if count == 0 and len(row) > 0:
                 headers.extend(row)  # This will be used to create the keys for the dict
                 newheaders.extend(row)
             elif len(row) > 0:
@@ -128,17 +132,24 @@ def dictToCSV(boolval):
     global oldfile
 
     timestamp = int(time.time())
-
-    new_filename = str(timestamp) + ".newfeatures_" + oldfile = ".csv"
+    new_filename = str(timestamp) + ".newfeatures_" + oldfile + ".csv"
     with open (new_filename, 'w') as csvf:
         csvwriter = csv.writer(csvf, delimiter=' ',
                                 quotechar='|', quoting=csv.QUOTE_MINIMAL)
         csvwriter.writerow(newheaders)
 
-        for stmt in sorted(statements):
+        for stmt in sorted(statements):  # stmt is the rmkey
             tempRow = []
             for hdr in newheaders:
-                tempRow.append(stmt[hdr])
+                if hdr == 'rm_key':
+                    tempRow.append(stmt)
+                else:
+                    try:
+                        tempRow.append(statements[stmt][hdr])
+                    except:
+                        print("[error] stmt was :  " + str(stmt))
+                        print("[error] header in newheaders was :  " + str(hdr))
+                        print("[error] statement was :  " + str(statements[stmt]))
             csvwriter.writerow(tempRow)
 
     if boolval is True:
@@ -163,96 +174,123 @@ def addNewFeatures():
                             statements[sid]['change_housing_index'] = home_price_index[year]
         elif 'perc_low_income' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Low Income Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['Low Income Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_low_income'] = temp
         elif 'perc_mod_income' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Moderate Income Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['Moderate Income Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_mod_income'] = temp
         elif 'perc_market_rate' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Market Rate Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['Market Rate Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_market_rate'] = temp
         elif 'perc_nonrevenue' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Non_revenue Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['Non_revenue Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_nonrevenue'] = temp
         elif 'perc_elderly_restricted' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Elderly Restricted Rental Units'])/float(statements[sid]['Total Rental Units'])
-                statements[sid]['perc_elderly_restricted'] = temp
+                try:
+                    temp = locale.atof(statements[sid]['Elderly Restricted Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
+                    statements[sid]['perc_elderly_restricted'] = temp
+                except:
+                    statements[sid]['perc_elderly_restricted'] = 0
         elif 'perc_unrestricted' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Unrestricted Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['Unrestricted Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_unrestricted'] = temp
         elif 'perc_student' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Student Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['Student Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_student'] = temp
         elif 'perc_other_restricted' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Other Restricted Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['Other Restricted Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_other_restricted'] = temp
         elif 'perc_fully_access_handi' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Fully Access Handicapped Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['Fully Access Handicapped Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_fully_access_handi'] = temp
         elif 'perc_part_access_handi' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Partially Access Handicapped Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['Partially Access Handicapped Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_part_access_handi'] = temp
         elif 'perc_studio' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Studio Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['Studio Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_studio'] = temp
         elif 'perc_1bed' in feature:
             for sid in statements:
-                temp = float(statements[sid]['One Bedroom Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['One Bedroom Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_1bed'] = temp
         elif 'perc_2bed' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Two Bedroom Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_2bed'] = temp
         elif 'perc_3bed' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Three Bedroom Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['Three Bedroom Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_3bed'] = temp
         elif 'perc_4bed' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Four Bedroom Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['Four Bedroom Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_4bed'] = temp
         elif 'perc_5bed' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Five Bedroom Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['Five Bedroom Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_5bed'] = temp
         elif 'perc_6bed' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Six Bedroom Rental Units'])/float(statements[sid]['Total Rental Units'])
+                temp = locale.atof(statements[sid]['Six Bedroom Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_6bed'] = temp
         elif 'ratio_2bed_studio' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Two Bedroom Rental Units'])/float(statements[sid]['Studio Rental Units'])
-                statements[sid]['ratio_2bed_studio'] = temp
+                studios = locale.atof(statements[sid]['Studio Rental Units'])
+                if studios > 0:
+                    temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/studios
+                    statements[sid]['ratio_2bed_studio'] = temp
+                else:
+                    statements[sid]['ratio_2bed_studio'] = 1
         elif 'ratio_2bed_1bed' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Two Bedroom Rental Units'])/float(statements[sid]['One Bedroom Rental Units'])
-                statements[sid]['ratio_2bed_1bed'] = temp
+                onebeds = locale.atof(statements[sid]['One Bedroom Rental Units'])
+                if onebeds > 0:
+                    temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/onebeds
+                    statements[sid]['ratio_2bed_1bed'] = temp
+                else:
+                    statements[sid]['ratio_2bed_1bed'] = 1
         elif 'ratio_2bed_3bed' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Two Bedroom Rental Units'])/float(statements[sid]['Three Bedroom Rental Units'])
-                statements[sid]['ratio_2bed_3bed'] = temp
+                threebeds = locale.atof(statements[sid]['Three Bedroom Rental Units'])
+                if threebeds > 0:
+                    temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/threebeds
+                    statements[sid]['ratio_2bed_3bed'] = temp
+                else:
+                    statements[sid]['ratio_2bed_3bed'] = 1
         elif 'ratio_2bed_4bed' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Two Bedroom Rental Units'])/float(statements[sid]['Four Bedroom Rental Units'])
-                statements[sid]['ratio_2bed_4bed'] = temp
+                fourbeds = locale.atof(statements[sid]['Four Bedroom Rental Units'])
+                if fourbeds > 0:
+                    temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/fourbeds
+                    statements[sid]['ratio_2bed_4bed'] = temp
+                else:
+                    statements[sid]['ratio_2bed_4bed'] = 1
         elif 'ratio_2bed_5bed' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Two Bedroom Rental Units'])/float(statements[sid]['Five Bedroom Rental Units'])
-                statements[sid]['ratio_2bed_5bed'] = temp
+                fivebeds = locale.atof(statements[sid]['Five Bedroom Rental Units'])
+                if fivebeds > 0:
+                    temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/fivebeds
+                    statements[sid]['ratio_2bed_5bed'] = temp
+                else:
+                    statements[sid]['ratio_2bed_5bed'] = 1
         elif 'ratio_2bed_6bed' in feature:
             for sid in statements:
-                temp = float(statements[sid]['Two Bedroom Rental Units'])/float(statements[sid]['Six Bedroom Rental Units'])
-                statements[sid]['ratio_2bed_6bed'] = temp
+                sixbeds = locale.atof(statements[sid]['Six Bedroom Rental Units'])
+                if sixbeds > 0:
+                    temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/sixbeds
+                    statements[sid]['ratio_2bed_6bed'] = temp
+                else:
+                    statements[sid]['ratio_2bed_6bed'] = 1
         else:
             print("Unknown feature:  " + feature)
 
