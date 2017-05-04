@@ -132,7 +132,7 @@ def dictToCSV(boolval):
     global oldfile
 
     timestamp = int(time.time())
-    new_filename = str(timestamp) + ".newfeatures_" + oldfile + ".csv"
+    new_filename = str(timestamp) + ".newfeatures_" + oldfile
     with open (new_filename, 'w') as csvf:
         csvwriter = csv.writer(csvf, delimiter=' ',
                                 quotechar='|', quoting=csv.QUOTE_MINIMAL)
