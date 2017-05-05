@@ -24,6 +24,7 @@ import weka.core.converters as converters
 from weka.core.converters import Loader
 import weka.core.dataset as ds
 from weka.classifiers import Classifier, Evaluation, FilteredClassifier
+from weka.attribute_selection import ASSearch, ASEvaluation, AttributeSelection
 from weka.core.dataset import Instances
 from weka.core.dataset import Instance
 from weka.core.dataset import Attribute
@@ -34,6 +35,9 @@ from weka.filters import Filter, MultiFilter
 from preprocessII import preprocess_csv
 from attribute_ranking import rank_attributes
 from splittrainingset import split_training_data
+from splittrainingset import read_data
+from sklearn.feature_selection import SelectFromModel
+from sklearn.linear_model import LassoCV
 
 # function to translate the grade
 def get_grade(grade):
@@ -66,10 +70,44 @@ def classify_data(data_set_train, data_set_test, output_file):
     # testing dataset uses dataset, provided by TA
     test = loader.load_file(data_set_test)
     test.class_is_last()
-      	
-    remove = Filter(classname='weka.filters.unsupervised.attribute.RemoveType',\
-                                                      options=['-T', 'string']) 
+
+    # lassoCV attribute selection
+    #model = LassoCV(eps=0.001, n_alphas=100, alphas=None, fit_intercept=True,\
+    #                normalize=False, precompute='auto', max_iter=1000,\
+    #                tol=0.0001, copy_X=True, cv=None, verbose=False, n_jobs=1,\
+    #                positive=False, random_state=None, selection='cyclic')
+    #selector = SelectFromModel(model, threshold=0.25, prefit=False)
+    #X,y = read_data('housingdata_train.csv')
+    #selector.fit(X,y) # 69 features in X to start
+    #Xprime = selector.transform(X)
+    #indices = selector.get_support(indices=True).tolist()
+    #print 'Retained indices', indices
+    #indices.append(72) # keep financial rating (ground truth)
+    ## keep only these indices
+    #remove = Filter(classname='weka.filters.unsupervised.attribute.Remove',\
+    #                              options=['-R', str(indices).strip('[]'), '-V'])
+    #remove = Filter(classname='weka.filters.unsupervised.attribute.RemoveType',\
+    #                                                  options=['-T', 'string'])
+
+    remove = Filter(classname='weka.filters.unsupervised.attribute.Remove',\
+                                                    options=['-R', '70,71,72'])
+    remove.inputformat(train)
+    filtered = remove.filter(train)
 	
+    # weka library attribute selection
+    search = ASSearch(classname="weka.attributeSelection.BestFirst", options=["-D", "1", "-N", "5"])
+    evaluator = ASEvaluation(classname="weka.attributeSelection.CfsSubsetEval", options=["-P", "1", "-E", "1"])
+    attsel = AttributeSelection()
+    attsel.search(search)
+    attsel.evaluator(evaluator)
+    attsel.select_attributes(filtered)
+    selected_attributes = map(lambda e: e + 1, attsel.selected_attributes)
+    print 'Selected Atrributes: ', selected_attributes
+    selected_attributes = str(selected_attributes).strip('[] ').replace(' ',',').replace(',,',',') + ',72'
+
+    remove = Filter(classname='weka.filters.unsupervised.attribute.Remove',\
+                                  options=['-R', selected_attributes, '-V'])
+
     # build a classifier
     classifier = Classifier(classname="weka.classifiers.meta.MultiClassClassifier")
     classifier.options=["-M","2","-W", "weka.classifiers.trees.J48","--", "-C","0.25","-B"]

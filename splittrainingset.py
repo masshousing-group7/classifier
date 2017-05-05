@@ -17,6 +17,24 @@ from preprocessIII import write_arff
 
 ######################## BEGIN FUNCTION DEFINITIONS ##########################
 
+# read in processed data from file
+def read_data(data_file_name):
+  # read in training data
+  training_file = open(data_file_name, 'r')
+  column_names = training_file.readline().strip().split(',')
+  reader = csv.reader(training_file, dialect='excel')
+  raw_cols = set()
+  X = []
+  y = []
+  for arow in reader:
+    last_col = len(arow) - 1
+    y.append(arow[last_col])
+    arow = arow[0:last_col - 2]
+    X.append(map(float, arow))
+
+  return X, y
+
+
 # helper function to split the training data into training and validation sets
 # has the side effect of creating two arff files
 def split_training_data(data_file, out_name_prefix):

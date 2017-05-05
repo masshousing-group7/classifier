@@ -15,6 +15,8 @@ import numpy as np
 import new_features
 from datetime import date
 from sklearn import preprocessing as pp
+from sklearn.feature_selection import SelectFromModel
+from sklearn.linear_model import LassoCV
 
 ######################## BEGIN FUNCTION DEFINITIONS ########################
 
@@ -106,21 +108,22 @@ def process_raw_data(data_file):
 
   # create numpy array from list object
   train_data_matrix = np.array(train_data)
+  train_data_matrix = np.append(train_data_matrix, unscaled_detail_codes,axis=1)
 
   # impute missing values
   imputer = pp.Imputer(missing_values='NaN', strategy='mean', axis=0)
   train_data_matrix = imputer.fit_transform(train_data_matrix)
 
   # uncomment next two lines for standard feature scaling
-  #std_scale = pp.StandardScaler().fit(train_data_matrix)
-  #train_data_matrix = std_scale.transform(train_data_matrix)
+  std_scale = pp.StandardScaler().fit(train_data_matrix)
+  train_data_matrix = std_scale.transform(train_data_matrix)
 
   # uncomment next two lines for minmax feature normalization
-  mean_scale = pp.MinMaxScaler().fit(train_data_matrix)
-  train_data_matrix = mean_scale.transform(train_data_matrix)
+  #mean_scale = pp.MinMaxScaler().fit(train_data_matrix)
+  #train_data_matrix = mean_scale.transform(train_data_matrix)
 
   # add unscaled detail codes, grades, and raw data
-  train_data_matrix = np.append(train_data_matrix, unscaled_detail_codes,axis=1)
+  #train_data_matrix = np.append(train_data_matrix, unscaled_detail_codes,axis=1)
   train_data_matrix = np.append(train_data_matrix, raw_rm_key_col, axis=1)
   train_data_matrix = np.append(train_data_matrix, raw_stmt_date_col, axis=1)
   train_data_matrix = np.append(train_data_matrix, grades, axis=1)
