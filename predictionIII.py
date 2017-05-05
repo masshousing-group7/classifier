@@ -81,7 +81,8 @@ def classify_data(data_set_train, data_set_test, output_file):
     selector.fit(X,y) # 69 features in X to start
     Xprime = selector.transform(X)
     indices = selector.get_support(indices=True).tolist()
-    print 'Retained indices', indices
+    indices = map(lambda e: e + 1, indices)
+    #print 'Retained indices', indices
     indices.append(72) # keep financial rating (ground truth)
     # keep only these indices
     remove = Filter(classname='weka.filters.unsupervised.attribute.Remove',\
