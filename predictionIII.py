@@ -82,31 +82,11 @@ def classify_data(data_set_train, data_set_test, output_file):
     Xprime = selector.transform(X)
     indices = selector.get_support(indices=True).tolist()
     indices = map(lambda e: e + 1, indices)
-    #print 'Retained indices', indices
     indices.append(72) # keep financial rating (ground truth)
     # keep only these indices
+    print 'Keeping columns (1-based):', indices
     remove = Filter(classname='weka.filters.unsupervised.attribute.Remove',\
                                   options=['-R', str(indices).strip('[]'), '-V'])
-    #remove = Filter(classname='weka.filters.unsupervised.attribute.RemoveType',\
-    #                                                  options=['-T', 'string'])
-
-    # weka library attribute selection
-    #remove = Filter(classname='weka.filters.unsupervised.attribute.Remove',\
-    #                                                options=['-R', '70,71,72'])
-    #remove.inputformat(train)
-    #filtered = remove.filter(train)
-    #search = ASSearch(classname="weka.attributeSelection.BestFirst", options=["-D", "1", "-N", "5"])
-    #evaluator = ASEvaluation(classname="weka.attributeSelection.CfsSubsetEval", options=["-P", "1", "-E", "1"])
-    #attsel = AttributeSelection()
-    #attsel.search(search)
-    #attsel.evaluator(evaluator)
-    #attsel.select_attributes(filtered)
-    #selected_attributes = map(lambda e: e + 1, attsel.selected_attributes)
-    #print 'Selected Atrributes: ', selected_attributes
-    #selected_attributes = str(selected_attributes).strip('[] ').replace(' ',',').replace(',,',',') + ',72'
-
-    #remove = Filter(classname='weka.filters.unsupervised.attribute.Remove',\
-    #                              options=['-R', selected_attributes, '-V'])
 
     # build a classifier
     classifier = Classifier(classname="weka.classifiers.meta.MultiClassClassifier")
