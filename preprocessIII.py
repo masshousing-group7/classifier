@@ -50,7 +50,7 @@ def write_arff(file, col_names, data_matrix):
 # helper function to process raw data
 # takes a file pointer and returns the processed data matrix
 # and a list of column names in order
-def process_raw_data(data_file):
+def process_raw_data(data_file, filter_by_dsc):
   today = date.today().toordinal()
   train_data = []
   grades = []
@@ -68,9 +68,45 @@ def process_raw_data(data_file):
 
   # first, build matrix of floating point values from raw data
   for cols in reader:
-    grade = cols[7].strip().upper() # letter grade is column 7
-    dsc = float(cols[8]) # dsc ratio is column 8
-    if grade != 'A' or 1.5 <= dsc and dsc <= 3.0:
+    if filter_by_dsc:
+      grade = cols[7].strip().upper() # letter grade is column 7
+      dsc = float(cols[8]) # dsc ratio is column 8
+      if grade != 'A' or (1.5 <= dsc and dsc <= 3.0):
+        row = []
+        for i in xrange(len(cols)):
+          c_name = column_names[i].strip().lower()
+          c_val = cols[i].strip().upper()
+          if 'date' in c_name: # handle date column
+            if 'stmt' in c_name:
+              raw_stmt_date_col.append([cols[i]])
+            mdy = c_val.split('/')
+            d = date(int(mdy[2]), int(mdy[0]), int(mdy[1])).toordinal()
+            row.append(today - d)
+          elif 'code' in c_name: # handle detail code column
+            detail_codes = []
+            for code in codes:
+              detail_codes.append(1 if c_val == code else 0)
+            unscaled_detail_codes.append(detail_codes)
+          elif 'grade' in c_name: # handle financial rating column
+            if c_val == 'A':
+              grades.append([0])
+            elif c_val == 'B':
+              grades.append([1])
+            elif c_val == 'C':
+              grades.append([2])
+            elif c_val == 'D':
+              grades.append([3])
+            else:
+              grades.append([4])
+          elif 'rm' in c_name and 'key' in c_name: # remove rm_key
+            raw_rm_key_col.append([cols[i]])
+          elif 'ratio' in c_name: # remove current ratio and dsc ratio
+            pass
+          else:
+            row.append(np.nan if c_val == '' else c_val.replace(',',''))
+        # convert all values to floating point numbers and append to data matrix
+        train_data.append(map(float, row))
+    else:
       row = []
       for i in xrange(len(cols)):
         c_name = column_names[i].strip().lower()
@@ -107,7 +143,9 @@ def process_raw_data(data_file):
       train_data.append(map(float, row))
 
   # create numpy array from list object
+  print len(train_data), len(train_data[0])
   train_data_matrix = np.array(train_data)
+  print train_data_matrix.size
   train_data_matrix = np.append(train_data_matrix, unscaled_detail_codes,axis=1)
 
   # impute missing values
@@ -115,8 +153,8 @@ def process_raw_data(data_file):
   train_data_matrix = imputer.fit_transform(train_data_matrix)
 
   # uncomment next two lines for standard feature scaling
-  std_scale = pp.StandardScaler().fit(train_data_matrix)
-  train_data_matrix = std_scale.transform(train_data_matrix)
+  #std_scale = pp.StandardScaler().fit(train_data_matrix)
+  #train_data_matrix = std_scale.transform(train_data_matrix)
 
   # uncomment next two lines for minmax feature normalization
   #mean_scale = pp.MinMaxScaler().fit(train_data_matrix)
@@ -173,8 +211,8 @@ def preprocess_csv(train_csv_name, test_csv_name, out_prefix):
 
   # read and process data
   try:
-    train_data_matrix, train_column_names = process_raw_data(train_data_file)
-    test_data_matrix, test_column_names = process_raw_data(test_data_file)
+    train_data_matrix, train_column_names = process_raw_data(train_data_file, True)
+    test_data_matrix, test_column_names = process_raw_data(test_data_file, False)
   finally:
     train_data_file.close()
     test_data_file.close()
