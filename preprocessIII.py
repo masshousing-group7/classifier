@@ -143,9 +143,7 @@ def process_raw_data(data_file, filter_by_dsc):
       train_data.append(map(float, row))
 
   # create numpy array from list object
-  print len(train_data), len(train_data[0])
   train_data_matrix = np.array(train_data)
-  print train_data_matrix.size
   train_data_matrix = np.append(train_data_matrix, unscaled_detail_codes,axis=1)
 
   # impute missing values
@@ -153,8 +151,8 @@ def process_raw_data(data_file, filter_by_dsc):
   train_data_matrix = imputer.fit_transform(train_data_matrix)
 
   # uncomment next two lines for standard feature scaling
-  #std_scale = pp.StandardScaler().fit(train_data_matrix)
-  #train_data_matrix = std_scale.transform(train_data_matrix)
+  std_scale = pp.StandardScaler().fit(train_data_matrix)
+  train_data_matrix = std_scale.transform(train_data_matrix)
 
   # uncomment next two lines for minmax feature normalization
   #mean_scale = pp.MinMaxScaler().fit(train_data_matrix)
