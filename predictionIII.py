@@ -59,6 +59,22 @@ def get_letter_grade(grade):
     else:
         return "F"
 
+# function to do lasso attribute selection
+def do_attribute_selection(train_csv_name):
+  th = .30 # threshold
+  model = LassoCV(eps=0.001, n_alphas=100, alphas=None, fit_intercept=True,\
+                  normalize=False, precompute='auto', max_iter=10000,\
+                  tol=0.0001, copy_X=True, cv=None, verbose=False, n_jobs=1,\
+                  positive=False, random_state=None, selection='cyclic')
+  selector = SelectFromModel(model, threshold=th, prefit=False)
+  X,y = read_data(train_csv_name)
+  selector.fit(X,y) # 69 features in X to start
+  Xprime = selector.transform(X)
+  indices = selector.get_support(indices=True).tolist()
+  indices = map(lambda e: e + 1, indices)
+  print 'Feature indices with threshold above:', th, ':', indices
+  return indices
+
 #function for data classification for phase II with MultiClassClassifier and J48
 def classify_data(data_set_train, data_set_test, output_file):
     loader = Loader("weka.core.converters.ArffLoader")
@@ -71,17 +87,7 @@ def classify_data(data_set_train, data_set_test, output_file):
     test = loader.load_file(data_set_test)
     test.class_is_last()
 
-    # lassoCV attribute selection
-    model = LassoCV(eps=0.001, n_alphas=100, alphas=None, fit_intercept=True,\
-                    normalize=False, precompute='auto', max_iter=1000,\
-                    tol=0.0001, copy_X=True, cv=None, verbose=False, n_jobs=1,\
-                    positive=False, random_state=None, selection='cyclic')
-    selector = SelectFromModel(model, threshold=0.25, prefit=False)
-    X,y = read_data('housingdata_train.csv')
-    selector.fit(X,y) # 69 features in X to start
-    Xprime = selector.transform(X)
-    indices = selector.get_support(indices=True).tolist()
-    indices = map(lambda e: e + 1, indices)
+    indices = do_attribute_selection('housingdata_train.csv')
     indices.append(72) # keep financial rating (ground truth)
     # keep only these indices
     print 'Keeping columns (1-based):', indices
@@ -128,8 +134,12 @@ def classify_data_knn(data_set_train, data_set_test, output_file, neighbors_numb
     test = loader.load_file(data_set_test)
     test.class_is_last()
       	
-    remove = Filter(classname='weka.filters.unsupervised.attribute.RemoveType',\
-                                                      options=['-T', 'string']) 
+    indices = do_attribute_selection('housingdata_train.csv')
+    indices.append(72) # keep financial rating (ground truth)
+    # keep only these indices
+    print 'Keeping columns (1-based):', indices
+    remove = Filter(classname='weka.filters.unsupervised.attribute.Remove',\
+                                  options=['-R', str(indices).strip('[]'), '-V'])
 	
     # build a classifier
     classifier = Classifier(classname='weka.classifiers.lazy.IBk', options=["-K", str(neighbors_number)])
@@ -170,13 +180,13 @@ def simple_evaluation(train_data_set, test_data_set, classifier):
 def main():	
     try:
         jvm.start()
-        print 'MultiClassClassifier with original training and testing datasets'
+        print 'MultiClassClassifier with original training and extra testing datasets'
         classify_data('housingdata_train.arff', 'housingdata_test.arff', '1_MultiClass_false_predictions_phaseIII.txt')
-        print 'MultiClassClassifier with produced training and testing datasets from original training dataset'
+        print 'MultiClassClassifier with split training and validation datasets from original training dataset'
         classify_data("housingdata_split_train.arff", "housingdata_split_validation.arff", '2_MultiClass_false_predictions_phaseIII.txt')
-        print 'KNN Classifier with original training and testing datasets'
+        print 'KNN Classifier with original training and extra testing datasets'
         classify_data_knn('housingdata_train.arff', 'housingdata_test.arff', '1_IBk_false_predictions_phaseIII.txt',1)
-        print 'KNN Classifier with produced training and testing datasets from original training dataset'
+        print 'KNN Classifier with split training and validation datasets from original training dataset'
         classify_data_knn("housingdata_split_train.arff", "housingdata_split_validation.arff", '2_IBk_false_predictions_phaseIII.txt',1)
 		
     except Exception, e:
