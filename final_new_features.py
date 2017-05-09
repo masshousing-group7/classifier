@@ -114,10 +114,11 @@ def csvToDict(some_csv):
                 headers.extend(row)  # This will be used to create the keys for the dict
                 newheaders.extend(row)
             elif len(row) > 0:
-                if count not in statements:  # Using the count as a dict key
-                    statements[count] = {}  # Creates a dict for the id defined by count
-                    for num in range(1, len(row)):
-                        statements[count][headers[num]] = row[num]  # Ideally error check this
+            	key = "key_" + str("%07d" % count)
+                if key not in statements:  # Using the count as a dict key
+                    statements[key] = {}  # Creates a dict for the id defined by count
+                    for num in range(0, len(row)):
+                        statements[key][headers[num]] = row[num]  # Ideally error check this
             count += 1
 
     # Now that we've got all the old ones, let's add some new ones!
@@ -137,24 +138,18 @@ def dictToCSV(boolval):
         csvwriter = csv.writer(csvf, dialect="excel")
         csvwriter.writerow(newheaders)
 
-        for stmt in sorted(statements):  # stmt is the rmkey
+        for key in sorted(statements):  #
             tempRow = []
             for hdr in newheaders:
-                if hdr == 'rm_key':
-                    if isinstance(stmt, basestring):
-                        tempRow.append(stmt.replace('\n', ''))
+                try:
+                    if isinstance(statements[key][hdr], basestring):
+                        tempRow.append(statements[key][hdr].replace('\n', ''))
                     else:
-                        tempRow.append(stmt)
-                else:
-                    try:
-                        if isinstance(stmt, basestring):
-                            tempRow.append(statements[stmt][hdr].replace('\n', ''))
-                        else:
-                            tempRow.append(statements[stmt][hdr])
-                    except:
-                        print("[error] stmt was :  " + str(stmt))
-                        print("[error] header in newheaders was :  " + str(hdr))
-                        print("[error] statement was :  " + str(statements[stmt]))
+                        tempRow.append(statements[key][hdr])
+                except:
+                    print("[error] key was :  " + str(key))
+                    print("[error] header in newheaders was :  " + str(hdr))
+                    print("[error] statement was :  " + str(statements[key]))
             if len(tempRow) > 0:
                 csvwriter.writerow(tempRow)
 

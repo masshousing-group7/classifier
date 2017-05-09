@@ -116,7 +116,7 @@ def csvToDict(some_csv):
             elif len(row) > 0:
                 if count not in statements:  # Using the count as a dict key
                     statements[count] = {}  # Creates a dict for the id defined by count
-                    for num in range(1, len(row)):
+                    for num in range(0, len(row)):
                         statements[count][headers[num]] = row[num]  # Ideally error check this
             count += 1
 
@@ -137,18 +137,15 @@ def dictToCSV(boolval):
         csvwriter = csv.writer(csvf, dialect="excel")
         csvwriter.writerow(newheaders)
 
-        for stmt in sorted(statements):  # stmt is the rmkey
+        for key in sorted(statements):
             tempRow = []
             for hdr in newheaders:
-                if hdr == 'rm_key':
-                    tempRow.append(stmt)
-                else:
-                    try:
-                        tempRow.append(statements[stmt][hdr])
-                    except:
-                        print("[error] stmt was :  " + str(stmt))
-                        print("[error] header in newheaders was :  " + str(hdr))
-                        print("[error] statement was :  " + str(statements[stmt]))
+                try:
+                    tempRow.append(statements[key][hdr])
+                except:
+                    print("[error] key was :  " + str(key))
+                    print("[error] header in newheaders was :  " + str(hdr))
+                    print("[error] statement was :  " + str(statements[key]))
             csvwriter.writerow(tempRow)
 
     if boolval is True:
