@@ -42,7 +42,9 @@ def split_training_data(data_file, out_name_prefix):
   # using these keys for validation leaves us with 579 validation examples
   validation_rm_keys = Set([769,774,1164,1048,786,660,792,1050,796,674,675,\
                             808,682,699,700,703,707,840,976,632,803,980,\
-                            755,759,640,259,780,653,655,784,1042,771,789,\
+                            979,993,955,744,1002,1004,\
+                            755,759,640,259,780,653,784,1042,771,789,\
+                            793,981,667,1057,938,684,823,712,972,720,\
                             783,805,992,749,1008,1143,766])
   training_set = []
   validation_set = []
