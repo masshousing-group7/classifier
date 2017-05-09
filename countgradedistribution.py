@@ -119,11 +119,13 @@ if __name__ == '__main__':
       else:
         all_Fs += v
 
-  print 'all_As', all_As
-  print 'all_Bs', all_Bs
-  print 'all_Cs', all_Cs
-  print 'all_Ds', all_Ds
-  print 'all_Fs', all_Fs
+  total = float(all_As + all_Bs + all_Cs + all_Ds + all_Fs)
+  print 'all_As', all_As, '({0:.2f}%)'.format(all_As / total * 100)
+  print 'all_Bs', all_Bs, '({0:.2f}%)'.format(all_Bs / total * 100)
+  print 'all_Cs', all_Cs, '({0:.2f}%)'.format(all_Cs / total * 100)
+  print 'all_Ds', all_Ds, '({0:.2f}%)'.format(all_Ds / total * 100)
+  print 'all_Fs', all_Fs, '({0:.2f}%)'.format(all_Fs / total * 100)
+  print 'Total:', total
   print
 
   # tally grades in limited_rm_key set
@@ -146,20 +148,24 @@ if __name__ == '__main__':
       else:
         limited_Fs += v
 
-  print 'limited_As', limited_As
-  print 'limited_Bs', limited_Bs
-  print 'limited_Cs', limited_Cs
-  print 'limited_Ds', limited_Ds
-  print 'limited_Fs', limited_Fs
+  total = float(limited_As + limited_Bs + limited_Cs + limited_Ds + limited_Fs)
+  print 'limited_As', limited_As, '({0:.2f}%)'.format(limited_As / total * 100)
+  print 'limited_Bs', limited_Bs, '({0:.2f}%)'.format(limited_Bs / total * 100)
+  print 'limited_Cs', limited_Cs, '({0:.2f}%)'.format(limited_Cs / total * 100)
+  print 'limited_Ds', limited_Ds, '({0:.2f}%)'.format(limited_Ds / total * 100)
+  print 'limited_Fs', limited_Fs, '({0:.2f}%)'.format(limited_Fs / total * 100)
+  print 'Total:', total
   print
 
   # selected rm_keys
   validation_rm_keys = Set([769,774,1164,1048,786,660,792,1050,796,674,675,\
                             808,682,699,700,703,707,840,976,632,803,980,\
-                            979,993,955,744,1002,1004,\
-                            755,759,640,259,780,653,784,1042,771,789,\
-                            793,981,667,1057,938,684,823,712,972,720,\
-                            783,805,992,749,1008,1143,766])
+                            #979,993,955,744,1002,1004,\
+                            755,759,640,259,780,653,\
+                            784,1042,771,789,\
+                            #793,981,667,1057,938])
+                            684,823,712,972,720])
+                            #783,805,992,749,1008,1143,766])
 
   # uncoment this section to see grade distribution for selected rm_keys in
   # all_rm_key set
@@ -182,11 +188,13 @@ if __name__ == '__main__':
       else:
         all_Fs += v
 
-  print 'all_As', all_As
-  print 'all_Bs', all_Bs
-  print 'all_Cs', all_Cs
-  print 'all_Ds', all_Ds
-  print 'all_Fs', all_Fs
+  total = float(all_As + all_Bs + all_Cs + all_Ds + all_Fs)
+  print 'all_As', all_As, '({0:.2f}%)'.format(all_As / total * 100)
+  print 'all_Bs', all_Bs, '({0:.2f}%)'.format(all_Bs / total * 100)
+  print 'all_Cs', all_Cs, '({0:.2f}%)'.format(all_Cs / total * 100)
+  print 'all_Ds', all_Ds, '({0:.2f}%)'.format(all_Ds / total * 100)
+  print 'all_Fs', all_Fs, '({0:.2f}%)'.format(all_Fs / total * 100)
+  print 'Total:', total
   print
   # end selected rm_keys distribution in all_rm_key set
 
@@ -211,14 +219,15 @@ if __name__ == '__main__':
       else:
         limited_Fs += v
 
-  print 'limited_As', limited_As
-  print 'limited_Bs', limited_Bs
-  print 'limited_Cs', limited_Cs
-  print 'limited_Ds', limited_Ds
-  print 'limited_Fs', limited_Fs
-  # end selected rm_keys distribution in limited_rm_key set
+  total = float(limited_As + limited_Bs + limited_Cs + limited_Ds + limited_Fs)
+  print 'limited_As', limited_As, '({0:.2f}%)'.format(limited_As / total * 100)
+  print 'limited_Bs', limited_Bs, '({0:.2f}%)'.format(limited_Bs / total * 100)
+  print 'limited_Cs', limited_Cs, '({0:.2f}%)'.format(limited_Cs / total * 100)
+  print 'limited_Ds', limited_Ds, '({0:.2f}%)'.format(limited_Ds / total * 100)
+  print 'limited_Fs', limited_Fs, '({0:.2f}%)'.format(limited_Fs / total * 100)
+  print 'Total:', total
   print
-  print 'Total:', limited_As + limited_Bs + limited_Cs + limited_Ds + limited_Fs
+  # end selected rm_keys distribution in limited_rm_key set
   exit(0)
 
   # this section prints the grade distrubtion for each rm_key
