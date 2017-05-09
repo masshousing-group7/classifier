@@ -40,10 +40,15 @@ def read_data(data_file_name):
 def split_training_data(data_file, out_name_prefix):
   # selected rm keys based on count grade distribution script
   # using these keys for validation leaves us with 579 validation examples
-  validation_rm_keys = Set([769,774,674,698,703,840,803,979,1002,1004,723,\
-                            707,640,780,653,910,784,793,981,668,671,987,\
-                            770,1067,1068,1072,645,1161,656,678,687,708,746,\
-                            1052,938,823,957,1013,1059,715,1000,749])
+  # validation_rm_keys = Set([769,774,674,698,703,840,803,979,1002,1004,723,\
+                            # 707,640,780,653,910,784,793,981,668,671,987,\
+                            # 770,1067,1068,1072,645,1161,656,678,687,708,746,\
+                            # 1052,938,823,957,1013,1059,715,1000,749])
+  # old set of rm_keys
+  validation_rm_keys = Set([769,774,1164,1048,786,660,792,1050,796,674,675,\
+                            808,682,699,700,703,707,840,976,632,803,980,\
+                            755,759,640,259,780,653,655,784,1042,771,789,\
+                            783,805,992,749,1008,1143,766])
   training_set = []
   validation_set = []
   column_names = data_file.readline().strip().split(',')
