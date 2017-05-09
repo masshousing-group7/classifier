@@ -133,7 +133,7 @@ def dictToCSV(boolval):
 
     timestamp = int(time.time())
     new_filename = str(timestamp) + ".newfeatures_" + oldfile
-    with open (new_filename, 'w') as csvf:
+    with open (new_filename, 'wb') as csvf:
         csvwriter = csv.writer(csvf, dialect="excel")
         csvwriter.writerow(newheaders)
 
@@ -141,15 +141,22 @@ def dictToCSV(boolval):
             tempRow = []
             for hdr in newheaders:
                 if hdr == 'rm_key':
-                    tempRow.append(stmt)
+                    if isinstance(stmt, basestring):
+                        tempRow.append(stmt.replace('\n', ''))
+                    else:
+                        tempRow.append(stmt)
                 else:
                     try:
-                        tempRow.append(statements[stmt][hdr])
+                        if isinstance(stmt, basestring):
+                            tempRow.append(statements[stmt][hdr].replace('\n', ''))
+                        else:
+                            tempRow.append(statements[stmt][hdr])
                     except:
                         print("[error] stmt was :  " + str(stmt))
                         print("[error] header in newheaders was :  " + str(hdr))
                         print("[error] statement was :  " + str(statements[stmt]))
-            csvwriter.writerow(tempRow)
+            if len(tempRow) > 0:
+                csvwriter.writerow(tempRow)
 
     if boolval is True:
         return new_filename
@@ -171,6 +178,8 @@ def addNewFeatures():
                     for year in home_price_index:
                         if year in statements[sid]['Stmt_date']:
                             statements[sid]['change_housing_index'] = home_price_index[year]
+                        else:
+                            statements[sid]['change_housing_index'] = 0
         elif 'perc_low_income' in feature:
             for sid in statements:
                 temp = locale.atof(statements[sid]['Low Income Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
