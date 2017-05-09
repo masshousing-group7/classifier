@@ -125,7 +125,7 @@ if __name__ == '__main__':
   print 'all_Cs', all_Cs, '({0:.2f}%)'.format(all_Cs / total * 100)
   print 'all_Ds', all_Ds, '({0:.2f}%)'.format(all_Ds / total * 100)
   print 'all_Fs', all_Fs, '({0:.2f}%)'.format(all_Fs / total * 100)
-  print 'Total:', total
+  print 'Total:', int(total)
   print
 
   # tally grades in limited_rm_key set
@@ -154,18 +154,14 @@ if __name__ == '__main__':
   print 'limited_Cs', limited_Cs, '({0:.2f}%)'.format(limited_Cs / total * 100)
   print 'limited_Ds', limited_Ds, '({0:.2f}%)'.format(limited_Ds / total * 100)
   print 'limited_Fs', limited_Fs, '({0:.2f}%)'.format(limited_Fs / total * 100)
-  print 'Total:', total
+  print 'Total:', int(total)
   print
 
   # selected rm_keys
-  validation_rm_keys = Set([769,774,1164,1048,786,660,792,1050,796,674,675,\
-                            808,682,699,700,703,707,840,976,632,803,980,\
-                            #979,993,955,744,1002,1004,\
-                            755,759,640,259,780,653,\
-                            784,1042,771,789,\
-                            #793,981,667,1057,938])
-                            684,823,712,972,720])
-                            #783,805,992,749,1008,1143,766])
+  validation_rm_keys = Set([769,774,674,698,703,840,803,979,1002,1004,723,\
+                            707,640,780,653,910,784,793,981,668,671,987,\
+                            770,1067,1068,1072,645,1161,656,678,687,708,746,\
+                            1052,938,823,957,1013,1059,715,1000,749])
 
   # uncoment this section to see grade distribution for selected rm_keys in
   # all_rm_key set
@@ -194,7 +190,7 @@ if __name__ == '__main__':
   print 'all_Cs', all_Cs, '({0:.2f}%)'.format(all_Cs / total * 100)
   print 'all_Ds', all_Ds, '({0:.2f}%)'.format(all_Ds / total * 100)
   print 'all_Fs', all_Fs, '({0:.2f}%)'.format(all_Fs / total * 100)
-  print 'Total:', total
+  print 'Total:', int(total)
   print
   # end selected rm_keys distribution in all_rm_key set
 
@@ -225,7 +221,7 @@ if __name__ == '__main__':
   print 'limited_Cs', limited_Cs, '({0:.2f}%)'.format(limited_Cs / total * 100)
   print 'limited_Ds', limited_Ds, '({0:.2f}%)'.format(limited_Ds / total * 100)
   print 'limited_Fs', limited_Fs, '({0:.2f}%)'.format(limited_Fs / total * 100)
-  print 'Total:', total
+  print 'Total:', int(total)
   print
   # end selected rm_keys distribution in limited_rm_key set
   exit(0)
