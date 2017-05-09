@@ -92,7 +92,7 @@ def classify_data(data_set_train, data_set_test, output_file):
     # keep only these indices
     print 'Keeping columns (1-based):', indices
     remove = Filter(classname='weka.filters.unsupervised.attribute.Remove',\
-                                  options=['-R', str(indices).strip('[]'), '-V'])
+                                  options=['-R', str(indices).strip('[]').replace('L',''), '-V'])
 
     # build a classifier
     classifier = Classifier(classname="weka.classifiers.meta.MultiClassClassifier")
@@ -139,7 +139,7 @@ def classify_data_knn(data_set_train, data_set_test, output_file, neighbors_numb
     # keep only these indices
     print 'Keeping columns (1-based):', indices
     remove = Filter(classname='weka.filters.unsupervised.attribute.Remove',\
-                                  options=['-R', str(indices).strip('[]'), '-V'])
+                                  options=['-R', str(indices).strip('[]').replace('L',''), '-V'])
 	
     # build a classifier
     classifier = Classifier(classname='weka.classifiers.lazy.IBk', options=["-K", str(neighbors_number)])
