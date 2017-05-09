@@ -33,13 +33,13 @@ new_features = ['change_housing_index',
  'perc_3bed',
  'perc_4bed',
  'perc_5bed',
- 'perc_6bed',
- 'ratio_2bed_studio',
- 'ratio_2bed_1bed',
- 'ratio_2bed_3bed',
- 'ratio_2bed_4bed',
- 'ratio_2bed_5bed',
- 'ratio_2bed_6bed',
+ 'perc_6bed'
+ # 'ratio_2bed_studio',
+ # 'ratio_2bed_1bed',
+ # 'ratio_2bed_3bed',
+ # 'ratio_2bed_4bed',
+ # 'ratio_2bed_5bed',
+ # 'ratio_2bed_6bed'
 ]
 
 # This next dict
@@ -242,54 +242,67 @@ def addNewFeatures():
             for sid in statements:
                 temp = locale.atof(statements[sid]['Six Bedroom Rental Units'])/locale.atof(statements[sid]['Total Rental Units'])
                 statements[sid]['perc_6bed'] = temp
-        elif 'ratio_2bed_studio' in feature:
-            for sid in statements:
-                studios = locale.atof(statements[sid]['Studio Rental Units'])
-                if studios > 0:
-                    temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/studios
-                    statements[sid]['ratio_2bed_studio'] = temp
-                else:
-                    statements[sid]['ratio_2bed_studio'] = 1
-        elif 'ratio_2bed_1bed' in feature:
-            for sid in statements:
-                onebeds = locale.atof(statements[sid]['One Bedroom Rental Units'])
-                if onebeds > 0:
-                    temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/onebeds
-                    statements[sid]['ratio_2bed_1bed'] = temp
-                else:
-                    statements[sid]['ratio_2bed_1bed'] = 1
-        elif 'ratio_2bed_3bed' in feature:
-            for sid in statements:
-                threebeds = locale.atof(statements[sid]['Three Bedroom Rental Units'])
-                if threebeds > 0:
-                    temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/threebeds
-                    statements[sid]['ratio_2bed_3bed'] = temp
-                else:
-                    statements[sid]['ratio_2bed_3bed'] = 1
-        elif 'ratio_2bed_4bed' in feature:
-            for sid in statements:
-                fourbeds = locale.atof(statements[sid]['Four Bedroom Rental Units'])
-                if fourbeds > 0:
-                    temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/fourbeds
-                    statements[sid]['ratio_2bed_4bed'] = temp
-                else:
-                    statements[sid]['ratio_2bed_4bed'] = 1
-        elif 'ratio_2bed_5bed' in feature:
-            for sid in statements:
-                fivebeds = locale.atof(statements[sid]['Five Bedroom Rental Units'])
-                if fivebeds > 0:
-                    temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/fivebeds
-                    statements[sid]['ratio_2bed_5bed'] = temp
-                else:
-                    statements[sid]['ratio_2bed_5bed'] = 1
-        elif 'ratio_2bed_6bed' in feature:
-            for sid in statements:
-                sixbeds = locale.atof(statements[sid]['Six Bedroom Rental Units'])
-                if sixbeds > 0:
-                    temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/sixbeds
-                    statements[sid]['ratio_2bed_6bed'] = temp
-                else:
-                    statements[sid]['ratio_2bed_6bed'] = 1
+        # elif 'ratio_2bed_studio' in feature:
+        #     for sid in statements:
+        #         studios = locale.atof(statements[sid]['Studio Rental Units'])
+        #         if studios > 0:
+        #             temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/studios
+        #             statements[sid]['ratio_2bed_studio'] = temp
+        #         else:
+        #             statements[sid]['ratio_2bed_studio'] = 1
+        # elif 'ratio_2bed_1bed' in feature:
+        #     for sid in statements:
+        #         onebeds = locale.atof(statements[sid]['One Bedroom Rental Units'])
+        #         if onebeds > 0:
+        #             temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/onebeds
+        #             statements[sid]['ratio_2bed_1bed'] = temp
+        #         else:
+        #             statements[sid]['ratio_2bed_1bed'] = 1
+        # elif 'ratio_2bed_3bed' in feature:
+        #     for sid in statements:
+        #         threebeds = locale.atof(statements[sid]['Three Bedroom Rental Units'])
+        #         if threebeds > 0:
+        #             temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/threebeds
+        #             statements[sid]['ratio_2bed_3bed'] = temp
+        #         else:
+        #             statements[sid]['ratio_2bed_3bed'] = 1
+        # elif 'ratio_2bed_4bed' in feature:
+        #     for sid in statements:
+        #         fourbeds = locale.atof(statements[sid]['Four Bedroom Rental Units'])
+        #         if fourbeds > 0:
+        #             temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/fourbeds
+        #             statements[sid]['ratio_2bed_4bed'] = temp
+        #         else:
+        #             statements[sid]['ratio_2bed_4bed'] = 1
+        # elif 'ratio_2bed_5bed' in feature:
+        #     for sid in statements:
+        #         fivebeds = locale.atof(statements[sid]['Five Bedroom Rental Units'])
+        #         if fivebeds > 0:
+        #             temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/fivebeds
+        #             statements[sid]['ratio_2bed_5bed'] = temp
+        #         else:
+        #             statements[sid]['ratio_2bed_5bed'] = 1
+        # elif 'ratio_2bed_6bed' in feature:
+        #     for sid in statements:
+        #         sixbeds = locale.atof(statements[sid]['Six Bedroom Rental Units'])
+        #         if sixbeds > 0:
+        #             temp = locale.atof(statements[sid]['Two Bedroom Rental Units'])/sixbeds
+        #             statements[sid]['ratio_2bed_6bed'] = temp
+        #         else:
+        #             statements[sid]['ratio_2bed_6bed'] = 1
         else:
             print("Unknown feature:  " + feature)
 
+
+def main():
+    train_csv = "TrainingData.csv"
+    test_csv = "ExtraHousingData.csv"
+
+    print("File created from training data :  " + getNewFeaturesAndFilename(train_csv))
+    print("File created from test data :  " + getNewFeaturesAndFilename(test_csv))
+
+
+if __name__ == '__main__':
+    main()
+
+# End of File
