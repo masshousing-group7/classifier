@@ -61,7 +61,7 @@ def get_letter_grade(grade):
 
 # function to do lasso attribute selection
 def do_attribute_selection(train_csv_name):
-  th = .10 # threshold (.10 seems to be the sweet spot)
+  th = .20 # threshold (.20 seems to be the sweet spot)
   model = LassoCV(eps=0.001, n_alphas=1000, alphas=None, fit_intercept=True,\
                   normalize=False, precompute='auto', max_iter=10000,\
                   tol=0.0001, copy_X=True, cv=None, verbose=False, n_jobs=1,\
