@@ -210,7 +210,7 @@ def preprocess_csv(train_csv_name, test_csv_name, out_prefix):
   # read and process data
   try:
     train_data_matrix, train_column_names = process_raw_data(train_data_file, True)
-    test_data_matrix, test_column_names = process_raw_data(test_data_file, False)
+    test_data_matrix, test_column_names = process_raw_data(test_data_file, True)
   finally:
     train_data_file.close()
     test_data_file.close()
