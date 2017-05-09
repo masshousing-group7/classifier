@@ -114,7 +114,7 @@ def csvToDict(some_csv):
                 headers.extend(row)  # This will be used to create the keys for the dict
                 newheaders.extend(row)
             elif len(row) > 0:
-            	key = "key_" + str("%07d" % count)
+                key = "key_" + str("%07d" % count)
                 if key not in statements:  # Using the count as a dict key
                     statements[key] = {}  # Creates a dict for the id defined by count
                     for num in range(0, len(row)):
@@ -299,10 +299,16 @@ def addNewFeatures():
 
 
 def main():
+    global statements
+    global headers
+    global newheaders
     train_csv = "TrainingData.csv"
     test_csv = "ExtraHousingData.csv"
 
     print("File created from training data :  " + getNewFeaturesAndFilename(train_csv))
+    statements.clear()
+    del headers [:]
+    del newheaders [:]
     print("File created from test data :  " + getNewFeaturesAndFilename(test_csv))
 
 
